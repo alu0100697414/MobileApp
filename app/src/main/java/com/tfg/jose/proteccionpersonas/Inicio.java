@@ -18,7 +18,6 @@ public class Inicio extends AppCompatActivity {
 
     // Constructor
     public Inicio(){
-
         bluetooth = new BluetoothConnection(this);
     }
 
@@ -79,5 +78,9 @@ public class Inicio extends AppCompatActivity {
 
         unregisterReceiver(bluetooth.getReceiver());
         super.onDestroy();
+    }
+
+    BluetoothConnection getBluetoothConnection(){
+        return bluetooth;
     }
 }

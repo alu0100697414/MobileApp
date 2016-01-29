@@ -1,6 +1,8 @@
 package com.tfg.jose.proteccionpersonas;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -8,6 +10,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.support.v7.app.NotificationCompat;
@@ -25,6 +29,7 @@ import java.util.Set;
 public class BluetoothConnection {
 
     private Inicio inicio;
+    private Notification notifi;
 
     private String nombre_dispositivo;
     private String direccion_dispositivo;
@@ -38,6 +43,7 @@ public class BluetoothConnection {
     public BluetoothConnection(Inicio ini){
 
         this.inicio = ini;
+        this.notifi = new Notification(ini);
 
         this.nombre_dispositivo = "jose-TravelMate-5742-0";
         this.direccion_dispositivo = "00:15:83:E4:D7:86";
@@ -72,7 +78,8 @@ public class BluetoothConnection {
                         rssi_msg.setText("¡PELIGRO!\nSe ha superado la distancia límite. El agresor se encuentra a una distancia aproximada de:");
                         res_dist.setText(rdistance + "m");
 
-                        vibrar();
+                        notifi.vibrar();
+                        notifi.notificar();
                     }
 
                     // Si lo encuentra pero no la supera, se le dice
@@ -168,22 +175,6 @@ public class BluetoothConnection {
                 }
             }
         }, DELAY);
-    }
-
-    // Vibración
-    void vibrar(){
-        Vibrator v = (Vibrator) inicio.getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(800);
-    }
-
-    // Crear notificacion
-    void crearNotificacion(){
-        // Aqui crearemos la notificacion
-    }
-
-    // Notificar
-    void notificar(){
-        // Funcion que notifica
     }
 
     // Devuelve el nombre del dispositivo
