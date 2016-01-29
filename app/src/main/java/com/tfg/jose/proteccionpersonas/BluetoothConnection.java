@@ -1,6 +1,7 @@
 package com.tfg.jose.proteccionpersonas;
 
 import android.app.Activity;
+import android.app.TaskStackBuilder;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.support.v7.app.NotificationCompat;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -172,6 +174,16 @@ public class BluetoothConnection {
     void vibrar(){
         Vibrator v = (Vibrator) inicio.getSystemService(Context.VIBRATOR_SERVICE);
         v.vibrate(800);
+    }
+
+    // Crear notificacion
+    void crearNotificacion(){
+        // Aqui crearemos la notificacion
+    }
+
+    // Notificar
+    void notificar(){
+        // Funcion que notifica
     }
 
     // Devuelve el nombre del dispositivo
