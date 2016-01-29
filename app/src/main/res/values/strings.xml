@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">BluetoothAPP</string>
+    <string name="app_name">ProtectULL</string>
     <string name="action_settings">Configuración</string>
+    <string name="app_title">Protección de Personas</string>
+    <string name="buscando">Buscando...</string>
     <string name="Titulo">Datos del dispositivo del agresor</string>
     <string name="Titulo_Encontrado">Estado</string>
-    <string name="buscando">Buscando...</string>
 </resources>

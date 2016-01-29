@@ -14,11 +14,13 @@ import android.view.MenuItem;
 
 public class Inicio extends AppCompatActivity {
 
-    BluetoothConnection bluetooth;
+    private BluetoothConnection bluetooth;
+    private PanicButton pbutton;
 
     // Constructor
     public Inicio(){
         bluetooth = new BluetoothConnection(this);
+        pbutton = new PanicButton(this);
     }
 
     @Override
@@ -36,14 +38,14 @@ public class Inicio extends AppCompatActivity {
 
         registerReceiver(bluetooth.getReceiver(), bluetoothFilter);
 
+        pbutton.pushButton(); // Evento si se pulsa el botón
+
         bluetooth.estaActivado(); // Comprobamos si esta activado el bluetooth y sino, envia mensaje de activacion
 
         bluetooth.emparejados(); // Devuelve dispositivos emparejados
-
         bluetooth.emparejadoInfo(); // Coge info del dispositivo del agresor (emparejado)
 
         bluetooth.estaBuscando(); // Si esta buscando, para la busqueda
-
         bluetooth.buscar(); // Inicia la busqueda
 
         bluetooth.sinPeligro(); // Si tras 12s no lo encuentra, muestra mensaje de que no hay peligro
