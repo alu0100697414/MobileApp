@@ -30,7 +30,7 @@ public class BluetoothConnection {
     private Set<BluetoothDevice> pairedDevices;
 
     // El adaptador bluetooth tiene que ser final y por tanto inicializado aquí
-    final BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
+    private final BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
 
     // Constructor
     public BluetoothConnection(Inicio ini){
@@ -43,7 +43,7 @@ public class BluetoothConnection {
     }
 
     // Se llama al receiver cada vez que encuentra un dispositivo nuevo
-    final BroadcastReceiver receiver = new BroadcastReceiver(){
+    private final BroadcastReceiver receiver = new BroadcastReceiver(){
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -70,8 +70,7 @@ public class BluetoothConnection {
                         rssi_msg.setText("¡PELIGRO!\nSe ha superado la distancia límite. El agresor se encuentra a una distancia aproximada de:");
                         res_dist.setText(rdistance + "m");
 
-                        Vibrator v = (Vibrator) inicio.getSystemService(Context.VIBRATOR_SERVICE);
-                        v.vibrate(800);
+                        vibrar();
                     }
 
                     // Si lo encuentra pero no la supera, se le dice
@@ -169,6 +168,12 @@ public class BluetoothConnection {
         }, DELAY);
     }
 
+    // Vibración
+    void vibrar(){
+        Vibrator v = (Vibrator) inicio.getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(800);
+    }
+
     // Devuelve el nombre del dispositivo
     String getNombre_dispositivo(){
         return nombre_dispositivo;
@@ -182,5 +187,10 @@ public class BluetoothConnection {
     // Devuelve la distancia limite a la que se puede acercar el agresor/a
     int getDistancia_limite(){
         return distancia_limite;
+    }
+
+    // Devuelve el receiver
+    BroadcastReceiver getReceiver(){
+        return receiver;
     }
 }

@@ -35,7 +35,7 @@ public class Inicio extends AppCompatActivity {
         IntentFilter bluetoothFilter = new IntentFilter();
         bluetoothFilter.addAction(BluetoothDevice.ACTION_FOUND);
 
-        registerReceiver(bluetooth.receiver, bluetoothFilter);
+        registerReceiver(bluetooth.getReceiver(), bluetoothFilter);
 
         bluetooth.estaActivado(); // Comprobamos si esta activado el bluetooth y sino, envia mensaje de activacion
 
@@ -77,7 +77,7 @@ public class Inicio extends AppCompatActivity {
     public void onDestroy() {
         bluetooth.estaBuscando(); // Vuelvo a comprobar que esté parada la busqueda de dispositivos
 
-        unregisterReceiver(bluetooth.receiver);
+        unregisterReceiver(bluetooth.getReceiver());
         super.onDestroy();
     }
 }
