@@ -64,7 +64,7 @@ public class BluetoothConnection {
                 String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
 
                 // Si encuentra el dispositivo del agresor/a entra:
-                if(name.equals(getNombre_dispositivo())){
+                if(direccion_dispositivo.equals(getDireccion())){
 
                     // Parseamos el resultado para que muestre dos decimales
                     DecimalFormat df = new DecimalFormat("#.##");
@@ -128,7 +128,7 @@ public class BluetoothConnection {
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
 
-                if(device.getName().equals(getNombre_dispositivo())) {
+                if(device.getAddress().equals(direccion_dispositivo)) {
                     // Añadimos el nombre y la dirección para mostrarlo luego por el listview
                     mArrayAdapter[i] = ("Nombre: " + device.getName() + "\n" + "Dirección: " + device.getAddress());
                     i++;
@@ -158,7 +158,7 @@ public class BluetoothConnection {
     // Si no encuentra nada tras doce segundos
     void sinPeligro(){
         //delay in ms
-        int DELAY = 30000;
+        int DELAY = 12000;
 
         // Si cuando se acaba la búsqueda, no lo encontró, no hay peligro
         Handler handler = new Handler();
@@ -167,7 +167,7 @@ public class BluetoothConnection {
             public void run() {
                 TextView rssi_msg = (TextView) inicio.findViewById(R.id.res_busqueda);
 
-                if (rssi_msg.getText().equals("Buscando...")) {
+                if (rssi_msg.getText().equals("Buscando...") && BTAdapter.isEnabled()) {
                     BTAdapter.cancelDiscovery();
 
                     rssi_msg.setText("NO HAY PELIGRO");
@@ -175,6 +175,19 @@ public class BluetoothConnection {
                 }
             }
         }, DELAY);
+    }
+
+    String getDireccion(){
+        // Loop through paired devices
+        for (BluetoothDevice device : pairedDevices) {
+            if(device.getName().equals(getNombre_dispositivo())) {
+                if(device.getAddress().equals(this.direccion_dispositivo)){
+                    return device.getAddress();
+                }
+            }
+        }
+
+        return "null";
     }
 
     // Devuelve el nombre del dispositivo
@@ -195,5 +208,10 @@ public class BluetoothConnection {
     // Devuelve el receiver
     BroadcastReceiver getReceiver(){
         return receiver;
+    }
+
+    // Devuelve el adaptador Bluetooth
+    BluetoothAdapter getBTAdapter(){
+        return BTAdapter;
     }
 }

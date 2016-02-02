@@ -2,6 +2,7 @@ package com.tfg.jose.proteccionpersonas;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,6 +12,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class Inicio extends AppCompatActivity {
 
@@ -28,7 +31,7 @@ public class Inicio extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inicio);
-        
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -76,13 +79,34 @@ public class Inicio extends AppCompatActivity {
     // Destructor para cuando se cierre el programa
     @Override
     public void onDestroy() {
+        super.onDestroy();
+
         bluetooth.estaBuscando(); // Vuelvo a comprobar que esté parada la busqueda de dispositivos
 
         unregisterReceiver(bluetooth.getReceiver());
-        super.onDestroy();
     }
 
     BluetoothConnection getBluetoothConnection(){
         return bluetooth;
+    }
+
+    // Callback para cuando se devuelve algun estado
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+        // Si activo el Bluetooth
+        if (resultCode == -1) {
+            System.exit(0); // Reiniciamos la API para que no haya problema a la hora de buscar dispositivos
+            this.startActivity(new Intent(this.getApplicationContext(), Inicio.class));
+
+            Toast.makeText(Inicio.this, "Ha activado el Bluetooth.", Toast.LENGTH_SHORT).show();
+        }
+
+        // Si no lo activó
+        else if (resultCode == 0){
+            TextView rssi_msg = (TextView) this.findViewById(R.id.res_busqueda);
+            rssi_msg.setText("Bluetooth desactivado.");
+            
+            Toast.makeText(Inicio.this, "No ha activado el Bluetooth.", Toast.LENGTH_SHORT).show();
+        }
     }
 }
