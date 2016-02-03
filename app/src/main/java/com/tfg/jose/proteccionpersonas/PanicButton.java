@@ -20,6 +20,7 @@ public class PanicButton {
         this.telefono = "tel:689316443";
     }
 
+    // Función para poner el botón de pánico
     void pushButton(){
         b = (Button) inicio.findViewById(R.id.panicButton);
         b.setOnClickListener(new View.OnClickListener() {

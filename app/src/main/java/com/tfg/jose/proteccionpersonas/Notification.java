@@ -25,7 +25,24 @@ public class Notification {
     }
 
     // Crear y enviar notificacion
-    void notificar(){
+    void notificar_radio(){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(inicio);
+
+        Intent intent = new Intent();
+        PendingIntent pendingIntent = PendingIntent.getActivity(inicio, 0, intent, 0);
+
+        builder.setContentIntent(pendingIntent);
+        builder.setSmallIcon(R.drawable.notification);
+        builder.setContentTitle("¡AVISO!");
+        builder.setContentText("El agresor ha sido detectado.");
+
+        NotificationManager notificationManager = (NotificationManager) inicio.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(1, builder.build());
+    }
+
+    // Crear y enviar notificacion
+    void notificar_limite(){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(inicio);
 
         Intent intent = new Intent();
@@ -34,7 +51,7 @@ public class Notification {
         builder.setContentIntent(pendingIntent);
         builder.setSmallIcon(R.drawable.notification);
         builder.setContentTitle("¡PELIGRO!");
-        builder.setContentText("Distancia límite superada: " + inicio.getBluetoothConnection().getDistancia_limite() + "m.");
+        builder.setContentText("El agresor ha superado la distancia límite.");
 
         NotificationManager notificationManager = (NotificationManager) inicio.getSystemService(Context.NOTIFICATION_SERVICE);
 

@@ -9,16 +9,20 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+
 public class Inicio extends AppCompatActivity {
 
     private BluetoothConnection bluetooth;
     private PanicButton pbutton;
+    private RCamera rcamera;
 
     // Constructor
     public Inicio(){
@@ -58,6 +62,17 @@ public class Inicio extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_inicio, menu);
+
+        return true;
+    }
+
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        MenuItem stop = menu.findItem(R.id.stop_video);
+        if(rcamera != null && rcamera.getCameraState() == true) {
+            stop.setVisible(true);
+        }
+
         return true;
     }
 
@@ -73,21 +88,11 @@ public class Inicio extends AppCompatActivity {
             return true;
         }
 
+        if(id == R.id.stop_video){
+            rcamera.stopRecording();
+        }
+
         return super.onOptionsItemSelected(item);
-    }
-
-    // Destructor para cuando se cierre el programa
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        bluetooth.estaBuscando(); // Vuelvo a comprobar que esté parada la busqueda de dispositivos
-
-        unregisterReceiver(bluetooth.getReceiver());
-    }
-
-    BluetoothConnection getBluetoothConnection(){
-        return bluetooth;
     }
 
     // Callback para cuando se devuelve algun estado
@@ -105,8 +110,33 @@ public class Inicio extends AppCompatActivity {
         else if (resultCode == 0){
             TextView rssi_msg = (TextView) this.findViewById(R.id.res_busqueda);
             rssi_msg.setText("Bluetooth desactivado.");
-            
+
             Toast.makeText(Inicio.this, "No ha activado el Bluetooth.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // Devuelve el objeto de la clase Bluetooth Connection
+    BluetoothConnection getBluetoothConnection(){
+        return bluetooth;
+    }
+
+    // Devuelve el objeto de la clase RCamera
+    RCamera getRcamera(){
+        return rcamera;
+    }
+
+    // Set para inicializar el objeto de la cámara
+    void setRcamera(RCamera rc){
+        rcamera = rc;
+    }
+
+    // Destructor para cuando se cierre el programa
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        bluetooth.estaBuscando(); // Vuelvo a comprobar que esté parada la busqueda de dispositivos
+
+        unregisterReceiver(bluetooth.getReceiver());
     }
 }

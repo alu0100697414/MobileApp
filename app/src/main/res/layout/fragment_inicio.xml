@@ -65,4 +65,15 @@
         android:background="@drawable/button">
     </Button>
 
+    <SurfaceView
+        android:id="@+id/surface_camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/res_distancia"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignLeft="@+id/panicButton"
+        android:visibility="invisible"/>
+
 </RelativeLayout>

@@ -15,11 +15,13 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Set;
 
@@ -36,6 +38,8 @@ public class BluetoothConnection {
     private int distancia_limite;
     private Set<BluetoothDevice> pairedDevices;
 
+    private double px;
+
     // El adaptador bluetooth tiene que ser final y por tanto inicializado aquí
     private final BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -44,6 +48,8 @@ public class BluetoothConnection {
 
         this.inicio = ini;
         this.notifi = new Notification(ini);
+
+        this.px = -54;
 
         this.nombre_dispositivo = "jose-TravelMate-5742-0";
         this.direccion_dispositivo = "00:15:83:E4:D7:86";
@@ -58,7 +64,6 @@ public class BluetoothConnection {
 
             if(BluetoothDevice.ACTION_FOUND.equals(action)) {
 
-                double px = -54; // Valor rssi a un metro de distancia
                 double rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                 double distance = getDistance(rssi, px);
                 String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
@@ -78,14 +83,31 @@ public class BluetoothConnection {
                         rssi_msg.setText("¡PELIGRO!\nSe ha superado la distancia límite. El agresor se encuentra a una distancia aproximada de:");
                         res_dist.setText(rdistance + "m");
 
+                        // Vibración y notificación del límite superado
                         notifi.vibrar();
-                        notifi.notificar();
+                        notifi.notificar_limite();
+
+                        // Comienzo de grabación automática
+                        inicio.setRcamera(new RCamera(inicio));
+
+                        try {
+                            inicio.getRcamera().startRecording();
+                        }
+
+                        catch (IOException e) {
+                            String message = e.getMessage();
+                            Log.i(null, "Problem Start" + message);
+                            inicio.getRcamera().getMrec().release();
+                        }
                     }
 
                     // Si lo encuentra pero no la supera, se le dice
                     else {
                         rssi_msg.setText("Fuera de la distancia de peligro.");
                         res_dist.setText(rdistance + "m");
+
+                        // Notificación de que se encuentra por los alrededores
+                        notifi.notificar_radio();
                     }
 
                     // Finalizamos la búsqueda si lo encontramos
@@ -119,13 +141,14 @@ public class BluetoothConnection {
     }
 
     // Devuelve datos del dispositivo del agresor emparejado
+    // Funcion chivata
     void emparejadoInfo(){
         if (pairedDevices.size() > 0) {
 
             String[] mArrayAdapter = new String[1];
             int i = 0;
 
-            // Loop through paired devices
+            // Recorremos los dispositivos
             for (BluetoothDevice device : pairedDevices) {
 
                 if(device.getAddress().equals(direccion_dispositivo)) {
@@ -177,8 +200,9 @@ public class BluetoothConnection {
         }, DELAY);
     }
 
+    // Devuelve la dirección del agresor/a
     String getDireccion(){
-        // Loop through paired devices
+        // Recorremos los dispositivos
         for (BluetoothDevice device : pairedDevices) {
             if(device.getName().equals(getNombre_dispositivo())) {
                 if(device.getAddress().equals(this.direccion_dispositivo)){
