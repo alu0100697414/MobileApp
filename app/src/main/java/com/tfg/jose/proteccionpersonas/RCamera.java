@@ -1,22 +1,15 @@
 package com.tfg.jose.proteccionpersonas;
 
-import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
-import android.text.Layout;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -30,58 +23,37 @@ public class RCamera implements SurfaceHolder.Callback {
 
     private boolean cameraState;
 
-    private Inicio inicio;
+    private Context mContext;
+    private Activity mActivity;
 
     private Camera mCamera;
 
     // Constructor
-    public RCamera(Inicio ini){
+    public RCamera(Context context, Activity activity){
 
-        this.inicio = ini;
+        this.mContext = context;
+        this.mActivity = activity;
 
         this.cameraState = false;
 
         mCamera = Camera.open();
         mCamera.setDisplayOrientation(90);
 
-        int width_cam = mCamera.getParameters().getPreviewSize().width;
-        int height_cam = mCamera.getParameters().getPreviewSize().height;
-        final float scale = inicio.getResources().getDisplayMetrics().density; // Para las dimensiones en dp.
+        Camera.Parameters params = mCamera.getParameters();
+        params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        mCamera.setParameters(params);
 
-        surfaceView = (SurfaceView) inicio.findViewById(R.id.surface_camera);
-        surfaceView.getLayoutParams().width = (int) (height_cam / 12 * scale);
-        surfaceView.getLayoutParams().height = (int) (width_cam / 12 * scale);
+        surfaceView = (SurfaceView) mActivity.findViewById(R.id.surface_camera);
 
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
-    // Recoloca los elementos al iniciar la grabación
-    void pushElements(){
-
-        // SurfaceView
-        SurfaceView surface = (SurfaceView) inicio.findViewById(R.id.surface_camera);
-
-        RelativeLayout.LayoutParams lp_1 = (RelativeLayout.LayoutParams) surface.getLayoutParams();
-        lp_1.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-
-        surface.setLayoutParams(lp_1);
-        surface.setVisibility(View.VISIBLE);
-
-        // Panic Button
-        Button b = (Button) inicio.findViewById(R.id.panicButton);
-
-        RelativeLayout.LayoutParams lp_2 = (RelativeLayout.LayoutParams) b.getLayoutParams();
-        lp_2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-        b.setLayoutParams(lp_2);
-    }
-
     // Funcion para comenzar a grabar
     protected void startRecording() throws IOException {
 
-        pushElements();
+        surfaceView.setVisibility(View.VISIBLE);
 
         cameraState = true;
 
@@ -102,6 +74,8 @@ public class RCamera implements SurfaceHolder.Callback {
 
         mrec.prepare();
         mrec.start();
+
+        Toast.makeText(mContext, "Ha comenzado una grabación.", Toast.LENGTH_SHORT).show();
     }
 
     // Funcion para parar de grabar
@@ -110,34 +84,34 @@ public class RCamera implements SurfaceHolder.Callback {
 
         mrec.stop();
         mrec.release();
-        mrec = null;
 
-        Toast.makeText(inicio.getApplicationContext(), "El vídeo ha sido almacenado.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, "La grabación ha sido almacenada.", Toast.LENGTH_SHORT).show();
+    }
+
+    void stopCamera(){
+        mCamera.release();
+        mCamera = null;
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
-        if (mCamera != null){
-            Camera.Parameters params = mCamera.getParameters();
-            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-            mCamera.setParameters(params);
-        }
-        else {
-            Toast.makeText(inicio.getApplicationContext(), "Cámera no disponible.", Toast.LENGTH_LONG).show();
-        }
-
+        mrec.setPreviewDisplay(holder.getSurface());
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int hight) {}
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public void surfaceDestroyed(SurfaceHolder holder){
         if(mCamera != null){
-            mCamera.stopPreview();
-            mCamera.release();
+            //mCamera.stopPreview();
+            //mCamera.release();  // Solo cuando se acabe el uso de la camara
         }
+    }
+
+    // Devuelve la variable de la camara
+    Camera getmCamera(){
+        return mCamera;
     }
 
     // Devuelve el estado de la cámara
@@ -160,7 +134,7 @@ public class RCamera implements SurfaceHolder.Callback {
         mrec = m;
     }
 
-    // Introduce el estado de la cámaracd
+    // Introduce el estado cd la cámaracd
     void setCameraState(boolean state){
         cameraState = state;
     }

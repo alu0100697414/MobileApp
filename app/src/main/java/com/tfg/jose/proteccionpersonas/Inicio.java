@@ -1,33 +1,26 @@
 package com.tfg.jose.proteccionpersonas;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-
 public class Inicio extends AppCompatActivity {
 
     private BluetoothConnection bluetooth;
     private PanicButton pbutton;
-    private RCamera rcamera;
 
     // Constructor
     public Inicio(){
-        bluetooth = new BluetoothConnection(this);
-        pbutton = new PanicButton(this);
+        bluetooth = new BluetoothConnection(Inicio.this, this);
+        pbutton = new PanicButton(Inicio.this, this);
     }
 
     @Override
@@ -42,20 +35,36 @@ public class Inicio extends AppCompatActivity {
         // Filtro para cuando encuentre dispositivos bluetooth
         IntentFilter bluetoothFilter = new IntentFilter();
         bluetoothFilter.addAction(BluetoothDevice.ACTION_FOUND);
-
         registerReceiver(bluetooth.getReceiver(), bluetoothFilter);
 
-        pbutton.pushButton(); // Evento si se pulsa el botón
+        // Creamos el botón de pánico en la Activity
+        pbutton.pushButton();
 
         bluetooth.estaActivado(); // Comprobamos si esta activado el bluetooth y sino, envia mensaje de activacion
 
-        bluetooth.emparejados(); // Devuelve dispositivos emparejados
-        bluetooth.emparejadoInfo(); // Coge info del dispositivo del agresor (emparejado)
+        bluetooth.emparejados();
+        bluetooth.emparejadoInfo();
 
-        bluetooth.estaBuscando(); // Si esta buscando, para la busqueda
-        bluetooth.buscar(); // Inicia la busqueda
+//        bluetooth.sinPeligro(); // Si tras 12s no lo encuentra, muestra mensaje de que no hay peligro
 
-        bluetooth.sinPeligro(); // Si tras 12s no lo encuentra, muestra mensaje de que no hay peligro
+        startService(new Intent(this, BService.class));
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                TextView rssi_msg = (TextView) findViewById(R.id.res_busqueda);
+
+                if (rssi_msg.getText().equals("Buscando...") && bluetooth.getBTAdapter().isEnabled()) {
+                    bluetooth.getBTAdapter().cancelDiscovery();
+
+                    rssi_msg.setText("NO HAY PELIGRO");
+                    Toast.makeText(Inicio.this, "Búsqueda finalizada.", Toast.LENGTH_SHORT).show();
+                }
+
+                stopService(new Intent(Inicio.this, BService.class));
+            }
+        }, 12000);
     }
 
     @Override
@@ -69,7 +78,7 @@ public class Inicio extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
 
         MenuItem stop = menu.findItem(R.id.stop_video);
-        if(rcamera != null && rcamera.getCameraState() == true) {
+        if(bluetooth.getRcamera() != null && bluetooth.getRcamera().getCameraState() == true) {
             stop.setVisible(true);
         }
 
@@ -89,7 +98,12 @@ public class Inicio extends AppCompatActivity {
         }
 
         if(id == R.id.stop_video){
-            rcamera.stopRecording();
+            if(bluetooth.getRcamera().getCameraState() == true){
+                bluetooth.getRcamera().stopRecording();
+            }
+            else {
+                Toast.makeText(Inicio.this, "No se está grabando.", Toast.LENGTH_SHORT).show();
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -120,23 +134,21 @@ public class Inicio extends AppCompatActivity {
         return bluetooth;
     }
 
-    // Devuelve el objeto de la clase RCamera
-    RCamera getRcamera(){
-        return rcamera;
-    }
-
-    // Set para inicializar el objeto de la cámara
-    void setRcamera(RCamera rc){
-        rcamera = rc;
-    }
-
     // Destructor para cuando se cierre el programa
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        bluetooth.estaBuscando(); // Vuelvo a comprobar que esté parada la busqueda de dispositivos
+        if(bluetooth.getRcamera() != null){
 
+            if(bluetooth.getRcamera().getCameraState() == true){
+                bluetooth.getRcamera().stopRecording();
+            }
+
+            bluetooth.getRcamera().stopCamera();
+        }
+
+        bluetooth.estaBuscando(); // Vuelvo a comprobar que esté parada la busqueda de dispositivos
         unregisterReceiver(bluetooth.getReceiver());
     }
 }

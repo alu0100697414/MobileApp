@@ -1,20 +1,12 @@
 package com.tfg.jose.proteccionpersonas;
 
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Handler;
-import android.os.Vibrator;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -27,27 +19,34 @@ import java.util.Set;
 
 /**
  * Created by jose on 29/01/16.
+ *
+ * Clase que se encarga de la búsqueda de dispositivos a través de Bluetooth.
  */
+
 public class BluetoothConnection {
 
-    private Inicio inicio;
+    private Context mContext;
+    private Activity mActivity;
+
     private Notification notifi;
+    private RCamera rcamera;
 
     private String nombre_dispositivo;
     private String direccion_dispositivo;
     private int distancia_limite;
     private Set<BluetoothDevice> pairedDevices;
 
-    private double px;
+    private double px;  // Valor de intensidad de señal entre dos dispositivos a un metro de distancia.
 
     // El adaptador bluetooth tiene que ser final y por tanto inicializado aquí
     private final BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
 
     // Constructor
-    public BluetoothConnection(Inicio ini){
+    public BluetoothConnection(Context context, Activity activity){
+        this.mContext = context;
+        this.mActivity = activity;
 
-        this.inicio = ini;
-        this.notifi = new Notification(ini);
+        this.notifi = new Notification(context, activity);
 
         this.px = -54;
 
@@ -75,8 +74,8 @@ public class BluetoothConnection {
                     DecimalFormat df = new DecimalFormat("#.##");
                     String rdistance = df.format(distance);
 
-                    TextView rssi_msg = (TextView) inicio.findViewById(R.id.res_busqueda);
-                    TextView res_dist = (TextView) inicio.findViewById(R.id.res_distancia);
+                    TextView rssi_msg = (TextView) mActivity.findViewById(R.id.res_busqueda);
+                    TextView res_dist = (TextView) mActivity.findViewById(R.id.res_distancia);
 
                     // Si está dentro de la distancia límite se le avisa
                     if(distance < getDistancia_limite()){
@@ -88,17 +87,22 @@ public class BluetoothConnection {
                         notifi.notificar_limite();
 
                         // Comienzo de grabación automática
-                        inicio.setRcamera(new RCamera(inicio));
-
-                        try {
-                            inicio.getRcamera().startRecording();
+                        if(rcamera == null){
+                            rcamera = new RCamera(mContext,mActivity);
                         }
 
-                        catch (IOException e) {
-                            String message = e.getMessage();
-                            Log.i(null, "Problem Start" + message);
-                            inicio.getRcamera().getMrec().release();
+                        if(rcamera.getCameraState() == false){
+                            try {
+                                rcamera.startRecording();
+                            }
+
+                            catch (IOException e) {
+                                String message = e.getMessage();
+                                Log.i(null, "Problem Start" + message);
+                                rcamera.getMrec().release();
+                            }
                         }
+
                     }
 
                     // Si lo encuentra pero no la supera, se le dice
@@ -111,7 +115,7 @@ public class BluetoothConnection {
                     }
 
                     // Finalizamos la búsqueda si lo encontramos
-                    Toast.makeText(inicio, "Búsqueda finalizada.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Búsqueda finalizada.", Toast.LENGTH_SHORT).show();
                     BTAdapter.cancelDiscovery();
 
                 }
@@ -130,7 +134,7 @@ public class BluetoothConnection {
     void estaActivado(){
         if (!BTAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            inicio.startActivityForResult(enableBtIntent, 1);
+            mActivity.startActivityForResult(enableBtIntent, 1);
         }
     }
 
@@ -159,9 +163,9 @@ public class BluetoothConnection {
             }
 
             // Listamos todos los dispositivos emparejados con el nuestro
-            ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(inicio, android.R.layout.simple_list_item_1, mArrayAdapter);
+            ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_list_item_1, mArrayAdapter);
 
-            ListView listView = (ListView) inicio.findViewById(R.id.list_view);
+            ListView listView = (ListView) mActivity.findViewById(R.id.list_view);
             listView.setAdapter(itemsAdapter);
         }
     }
@@ -188,14 +192,16 @@ public class BluetoothConnection {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                TextView rssi_msg = (TextView) inicio.findViewById(R.id.res_busqueda);
+                TextView rssi_msg = (TextView) mActivity.findViewById(R.id.res_busqueda);
 
                 if (rssi_msg.getText().equals("Buscando...") && BTAdapter.isEnabled()) {
                     BTAdapter.cancelDiscovery();
 
                     rssi_msg.setText("NO HAY PELIGRO");
-                    Toast.makeText(inicio, "Búsqueda finalizada.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Búsqueda finalizada.", Toast.LENGTH_SHORT).show();
                 }
+
+                stopService(new Intent(mContext, BService.class));
             }
         }, DELAY);
     }
@@ -237,5 +243,15 @@ public class BluetoothConnection {
     // Devuelve el adaptador Bluetooth
     BluetoothAdapter getBTAdapter(){
         return BTAdapter;
+    }
+
+    // Devuelve el objeto de la clase RCamera
+    RCamera getRcamera(){
+        return rcamera;
+    }
+
+    // Set para inicializar el objeto de la cámara
+    void setRcamera(RCamera rc){
+        rcamera = rc;
     }
 }
