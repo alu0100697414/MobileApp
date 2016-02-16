@@ -201,7 +201,7 @@ public class BluetoothConnection {
                     Toast.makeText(mContext, "Búsqueda finalizada.", Toast.LENGTH_SHORT).show();
                 }
 
-                stopService(new Intent(mContext, BService.class));
+                //mContext.stopService(new Intent(mContext, BService.class));
             }
         }, DELAY);
     }

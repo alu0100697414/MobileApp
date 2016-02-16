@@ -12,6 +12,9 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class Inicio extends AppCompatActivity {
 
     private BluetoothConnection bluetooth;
@@ -46,6 +49,13 @@ public class Inicio extends AppCompatActivity {
         bluetooth.emparejadoInfo();
 
 //        bluetooth.sinPeligro(); // Si tras 12s no lo encuentra, muestra mensaje de que no hay peligro
+
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+
+            }
+        }, 0, 30000);//put here time 1000 milliseconds=1 second
 
         startService(new Intent(this, BService.class));
 
