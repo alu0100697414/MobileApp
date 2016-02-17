@@ -3,6 +3,7 @@ package com.tfg.jose.proteccionpersonas;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.widget.Toast;
 
 public class BService extends Service {
 
@@ -29,7 +30,9 @@ public class BService extends Service {
 
     // Destructor del Servicio
     @Override
-    public void onDestroy() {}
+    public void onDestroy() {
+        Toast.makeText(BService.this, "Servicio murío :___(", Toast.LENGTH_SHORT).show();
+    }
 
     // Método encargado de enlazar con la Activity
     @Override

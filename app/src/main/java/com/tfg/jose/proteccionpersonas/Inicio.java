@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +21,7 @@ public class Inicio extends AppCompatActivity {
 
     private BluetoothConnection bluetooth;
     private PanicButton pbutton;
+    private RCamera rcamera;
 
     // Constructor
     public Inicio(){
@@ -35,6 +38,9 @@ public class Inicio extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        rcamera = new RCamera(Inicio.this, this);
+        bluetooth.setRcamera(rcamera);
+
         // Filtro para cuando encuentre dispositivos bluetooth
         IntentFilter bluetoothFilter = new IntentFilter();
         bluetoothFilter.addAction(BluetoothDevice.ACTION_FOUND);
@@ -45,36 +51,14 @@ public class Inicio extends AppCompatActivity {
 
         bluetooth.estaActivado(); // Comprobamos si esta activado el bluetooth y sino, envia mensaje de activacion
 
-        bluetooth.emparejados();
-        bluetooth.emparejadoInfo();
-
-//        bluetooth.sinPeligro(); // Si tras 12s no lo encuentra, muestra mensaje de que no hay peligro
-
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                startService(new Intent(Inicio.this, BService.class));
 
+                bluetooth.sinPeligro(); // Si tras 12s no lo encuentra, muestra mensaje de que no hay peligro
             }
-        }, 0, 30000);//put here time 1000 milliseconds=1 second
-
-        startService(new Intent(this, BService.class));
-
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                TextView rssi_msg = (TextView) findViewById(R.id.res_busqueda);
-
-                if (rssi_msg.getText().equals("Buscando...") && bluetooth.getBTAdapter().isEnabled()) {
-                    bluetooth.getBTAdapter().cancelDiscovery();
-
-                    rssi_msg.setText("NO HAY PELIGRO");
-                    Toast.makeText(Inicio.this, "Búsqueda finalizada.", Toast.LENGTH_SHORT).show();
-                }
-
-                stopService(new Intent(Inicio.this, BService.class));
-            }
-        }, 12000);
+        }, 0, 15000);
     }
 
     @Override

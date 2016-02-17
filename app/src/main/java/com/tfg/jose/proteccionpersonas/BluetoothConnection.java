@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -31,6 +32,8 @@ public class BluetoothConnection {
     private Notification notifi;
     private RCamera rcamera;
 
+    private boolean deviceFound;
+
     private String nombre_dispositivo;
     private String direccion_dispositivo;
     private int distancia_limite;
@@ -47,6 +50,8 @@ public class BluetoothConnection {
         this.mActivity = activity;
 
         this.notifi = new Notification(context, activity);
+
+        this.deviceFound = false;
 
         this.px = -54;
 
@@ -67,8 +72,10 @@ public class BluetoothConnection {
                 double distance = getDistance(rssi, px);
                 String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
 
+                deviceFound = true;
+
                 // Si encuentra el dispositivo del agresor/a entra:
-                if(direccion_dispositivo.equals(getDireccion())){
+                if(direccion_dispositivo.equals(getDireccion_dispositivo())){
 
                     // Parseamos el resultado para que muestre dos decimales
                     DecimalFormat df = new DecimalFormat("#.##");
@@ -87,9 +94,9 @@ public class BluetoothConnection {
                         notifi.notificar_limite();
 
                         // Comienzo de grabación automática
-                        if(rcamera == null){
-                            rcamera = new RCamera(mContext,mActivity);
-                        }
+//                        if(rcamera == null){
+//                            rcamera = new RCamera(mContext,mActivity);
+//                        }
 
                         if(rcamera.getCameraState() == false){
                             try {
@@ -115,7 +122,6 @@ public class BluetoothConnection {
                     }
 
                     // Finalizamos la búsqueda si lo encontramos
-                    Toast.makeText(mContext, "Búsqueda finalizada.", Toast.LENGTH_SHORT).show();
                     BTAdapter.cancelDiscovery();
 
                 }
@@ -138,38 +144,6 @@ public class BluetoothConnection {
         }
     }
 
-    // Coge dispositivos emparejados del telefono
-    void emparejados(){
-        // Coge los dispositivos emparejados
-        pairedDevices = BTAdapter.getBondedDevices();
-    }
-
-    // Devuelve datos del dispositivo del agresor emparejado
-    // Funcion chivata
-    void emparejadoInfo(){
-        if (pairedDevices.size() > 0) {
-
-            String[] mArrayAdapter = new String[1];
-            int i = 0;
-
-            // Recorremos los dispositivos
-            for (BluetoothDevice device : pairedDevices) {
-
-                if(device.getAddress().equals(direccion_dispositivo)) {
-                    // Añadimos el nombre y la dirección para mostrarlo luego por el listview
-                    mArrayAdapter[i] = ("Nombre: " + device.getName() + "\n" + "Dirección: " + device.getAddress());
-                    i++;
-                }
-            }
-
-            // Listamos todos los dispositivos emparejados con el nuestro
-            ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_list_item_1, mArrayAdapter);
-
-            ListView listView = (ListView) mActivity.findViewById(R.id.list_view);
-            listView.setAdapter(itemsAdapter);
-        }
-    }
-
     // Si el adaptador ya está buscando dispositivos, lo paramos
     void estaBuscando(){
         if (BTAdapter.isDiscovering()) {
@@ -188,36 +162,27 @@ public class BluetoothConnection {
         int DELAY = 12000;
 
         // Si cuando se acaba la búsqueda, no lo encontró, no hay peligro
-        Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 TextView rssi_msg = (TextView) mActivity.findViewById(R.id.res_busqueda);
+                TextView rssi_dist = (TextView) mActivity.findViewById(R.id.res_distancia);
 
-                if (rssi_msg.getText().equals("Buscando...") && BTAdapter.isEnabled()) {
+                if (deviceFound == false && BTAdapter.isEnabled()) {
                     BTAdapter.cancelDiscovery();
 
-                    rssi_msg.setText("NO HAY PELIGRO");
-                    Toast.makeText(mContext, "Búsqueda finalizada.", Toast.LENGTH_SHORT).show();
+                    rssi_msg.setText("NO HAY PELIGRO.");
+                    rssi_dist.setText("");
                 }
 
-                //mContext.stopService(new Intent(mContext, BService.class));
+                else {
+                    deviceFound = false;
+                }
+
+                mContext.stopService(new Intent(mContext, BService.class));
             }
         }, DELAY);
-    }
-
-    // Devuelve la dirección del agresor/a
-    String getDireccion(){
-        // Recorremos los dispositivos
-        for (BluetoothDevice device : pairedDevices) {
-            if(device.getName().equals(getNombre_dispositivo())) {
-                if(device.getAddress().equals(this.direccion_dispositivo)){
-                    return device.getAddress();
-                }
-            }
-        }
-
-        return "null";
     }
 
     // Devuelve el nombre del dispositivo
@@ -243,6 +208,11 @@ public class BluetoothConnection {
     // Devuelve el adaptador Bluetooth
     BluetoothAdapter getBTAdapter(){
         return BTAdapter;
+    }
+
+    // Devuelve los dispositivos emparejados
+    Set<BluetoothDevice> getpairedDevices(){
+        return pairedDevices;
     }
 
     // Devuelve el objeto de la clase RCamera

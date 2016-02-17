@@ -12,23 +12,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/Titulo"
-        android:text="@string/Titulo"/>
-
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/Titulo"
-        android:layout_marginTop="10dp"
-        android:id="@+id/list_view">
-    </ListView>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_view"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:layout_centerHorizontal="true"
         android:id="@+id/Titulo_Encontrado"
         android:text="@string/Titulo_Encontrado"/>
@@ -73,7 +57,6 @@
         android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignLeft="@+id/panicButton"
-        android:visibility="invisible"/>
+        android:layout_alignLeft="@+id/panicButton" />
 
 </RelativeLayout>

@@ -1,10 +1,12 @@
 package com.tfg.jose.proteccionpersonas;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -14,6 +16,8 @@ import java.io.IOException;
 
 /**
  * Created by jose on 2/02/16.
+ *
+ * Clase para la grabación de vídeo.
  */
 public class RCamera implements SurfaceHolder.Callback {
 
