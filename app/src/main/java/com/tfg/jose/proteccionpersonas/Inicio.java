@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
@@ -14,14 +15,19 @@ import android.view.SurfaceView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Inicio extends AppCompatActivity {
 
     private BluetoothConnection bluetooth;
     private PanicButton pbutton;
-    private RCamera rcamera;
+    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
 
     // Constructor
     public Inicio(){
@@ -38,9 +44,6 @@ public class Inicio extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        rcamera = new RCamera(Inicio.this, this);
-        bluetooth.setRcamera(rcamera);
-
         // Filtro para cuando encuentre dispositivos bluetooth
         IntentFilter bluetoothFilter = new IntentFilter();
         bluetoothFilter.addAction(BluetoothDevice.ACTION_FOUND);
@@ -51,14 +54,15 @@ public class Inicio extends AppCompatActivity {
 
         bluetooth.estaActivado(); // Comprobamos si esta activado el bluetooth y sino, envia mensaje de activacion
 
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
+        Runnable helloRunnable = new Runnable() {
             public void run() {
                 startService(new Intent(Inicio.this, BService.class));
 
                 bluetooth.sinPeligro(); // Si tras 12s no lo encuentra, muestra mensaje de que no hay peligro
             }
-        }, 0, 15000);
+        };
+
+        executor.scheduleAtFixedRate(helloRunnable, 0, 15, TimeUnit.SECONDS);
     }
 
     @Override
@@ -74,6 +78,8 @@ public class Inicio extends AppCompatActivity {
         MenuItem stop = menu.findItem(R.id.stop_video);
         if(bluetooth.getRcamera() != null && bluetooth.getRcamera().getCameraState() == true) {
             stop.setVisible(true);
+        } else {
+            stop.setVisible(false);
         }
 
         return true;
@@ -135,7 +141,7 @@ public class Inicio extends AppCompatActivity {
 
         if(bluetooth.getRcamera() != null){
 
-            if(bluetooth.getRcamera().getCameraState() == true){
+            if(bluetooth.getRcamera().getCameraState() == true) {
                 bluetooth.getRcamera().stopRecording();
             }
 
@@ -144,5 +150,7 @@ public class Inicio extends AppCompatActivity {
 
         bluetooth.estaBuscando(); // Vuelvo a comprobar que esté parada la busqueda de dispositivos
         unregisterReceiver(bluetooth.getReceiver());
+
+        executor.shutdown();
     }
 }

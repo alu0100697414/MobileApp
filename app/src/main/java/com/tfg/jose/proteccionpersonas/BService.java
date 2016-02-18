@@ -30,9 +30,7 @@ public class BService extends Service {
 
     // Destructor del Servicio
     @Override
-    public void onDestroy() {
-        Toast.makeText(BService.this, "Servicio murío :___(", Toast.LENGTH_SHORT).show();
-    }
+    public void onDestroy() {}
 
     // Método encargado de enlazar con la Activity
     @Override

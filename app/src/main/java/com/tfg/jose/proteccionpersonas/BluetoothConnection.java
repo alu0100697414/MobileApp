@@ -1,6 +1,7 @@
 package com.tfg.jose.proteccionpersonas;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -32,13 +33,13 @@ public class BluetoothConnection {
     private Notification notifi;
     private RCamera rcamera;
 
-    private boolean deviceFound;
+    private boolean deviceFound; // True si encuentra el dispositivo
 
     private String nombre_dispositivo;
     private String direccion_dispositivo;
     private int distancia_limite;
-    private Set<BluetoothDevice> pairedDevices;
 
+    private int time; // Tiempo que se tarda entre busquedas.
     private double px;  // Valor de intensidad de señal entre dos dispositivos a un metro de distancia.
 
     // El adaptador bluetooth tiene que ser final y por tanto inicializado aquí
@@ -54,6 +55,7 @@ public class BluetoothConnection {
         this.deviceFound = false;
 
         this.px = -54;
+        this.time = 30000;
 
         this.nombre_dispositivo = "jose-TravelMate-5742-0";
         this.direccion_dispositivo = "00:15:83:E4:D7:86";
@@ -73,6 +75,7 @@ public class BluetoothConnection {
                 String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
 
                 deviceFound = true;
+                time = 15000;
 
                 // Si encuentra el dispositivo del agresor/a entra:
                 if(direccion_dispositivo.equals(getDireccion_dispositivo())){
@@ -89,27 +92,31 @@ public class BluetoothConnection {
                         rssi_msg.setText("¡PELIGRO!\nSe ha superado la distancia límite. El agresor se encuentra a una distancia aproximada de:");
                         res_dist.setText(rdistance + "m");
 
-                        // Vibración y notificación del límite superado
-                        notifi.vibrar();
+                        // Vibración y notificación del límite supe
                         notifi.notificar_limite();
 
-                        // Comienzo de grabación automática
-//                        if(rcamera == null){
-//                            rcamera = new RCamera(mContext,mActivity);
-//                        }
+                        Intent intento = new Intent(mContext, Inicio.class);
+                        intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        mContext.startActivity(intento);
 
-                        if(rcamera.getCameraState() == false){
-                            try {
-                                rcamera.startRecording();
+                        // Grabación automática si la app está abierta<<<
+                        if(mActivity.hasWindowFocus() == true){
+                            if(rcamera == null) {
+                                rcamera = new RCamera(mContext,mActivity);
                             }
 
-                            catch (IOException e) {
-                                String message = e.getMessage();
-                                Log.i(null, "Problem Start" + message);
-                                rcamera.getMrec().release();
+                            if(rcamera.getCameraState() == false){
+                                try {
+                                    rcamera.startRecording();
+                                }
+
+                                catch (IOException e) {
+                                    String message = e.getMessage();
+                                    Log.i(null, "Problem Start" + message);
+                                    rcamera.getMrec().release();
+                                }
                             }
                         }
-
                     }
 
                     // Si lo encuentra pero no la supera, se le dice
@@ -123,7 +130,7 @@ public class BluetoothConnection {
 
                     // Finalizamos la búsqueda si lo encontramos
                     BTAdapter.cancelDiscovery();
-
+                    mContext.stopService(new Intent(mContext, BService.class));
                 }
 
             }
@@ -172,15 +179,15 @@ public class BluetoothConnection {
                 if (deviceFound == false && BTAdapter.isEnabled()) {
                     BTAdapter.cancelDiscovery();
 
+                    mContext.stopService(new Intent(mContext, BService.class));
+
                     rssi_msg.setText("NO HAY PELIGRO.");
                     rssi_dist.setText("");
-                }
 
-                else {
+                    time = 30000;
+                } else {
                     deviceFound = false;
                 }
-
-                mContext.stopService(new Intent(mContext, BService.class));
             }
         }, DELAY);
     }
@@ -200,6 +207,11 @@ public class BluetoothConnection {
         return distancia_limite;
     }
 
+    // Devuelve el tiempo entre busquedas
+    int getTime(){
+        return time;
+    }
+
     // Devuelve el receiver
     BroadcastReceiver getReceiver(){
         return receiver;
@@ -210,9 +222,9 @@ public class BluetoothConnection {
         return BTAdapter;
     }
 
-    // Devuelve los dispositivos emparejados
-    Set<BluetoothDevice> getpairedDevices(){
-        return pairedDevices;
+    // Devuelve si encontró el dispositivo
+    boolean getdeviceFound(){
+        return deviceFound;
     }
 
     // Devuelve el objeto de la clase RCamera

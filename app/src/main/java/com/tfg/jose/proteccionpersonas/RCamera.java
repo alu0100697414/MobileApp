@@ -1,12 +1,10 @@
 package com.tfg.jose.proteccionpersonas;
 
 import android.app.Activity;
-import android.app.Service;
 import android.content.Context;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
-import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -19,13 +17,14 @@ import java.io.IOException;
  *
  * Clase para la grabación de vídeo.
  */
+
 public class RCamera implements SurfaceHolder.Callback {
 
     private SurfaceHolder surfaceHolder;
     private SurfaceView surfaceView;
     public MediaRecorder mrec = new MediaRecorder();
 
-    private boolean cameraState;
+    private boolean cameraState; // True si la camara esta grabando
 
     private Context mContext;
     private Activity mActivity;
@@ -98,20 +97,13 @@ public class RCamera implements SurfaceHolder.Callback {
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        mrec.setPreviewDisplay(holder.getSurface());
-    }
+    public void surfaceCreated(SurfaceHolder holder) {}
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int hight) {}
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder){
-        if(mCamera != null){
-            //mCamera.stopPreview();
-            //mCamera.release();  // Solo cuando se acabe el uso de la camara
-        }
-    }
+    public void surfaceDestroyed(SurfaceHolder holder){}
 
     // Devuelve la variable de la camara
     Camera getmCamera(){
