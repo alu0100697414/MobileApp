@@ -12,6 +12,8 @@ import android.support.v7.app.NotificationCompat;
 
 /**
  * Created by jose on 29/01/16.
+ *
+ * Clase que tiene los métodos para las diferentes notificaciones que hagan falta en la app.
  */
 public class Notification {
 
@@ -21,12 +23,6 @@ public class Notification {
     public Notification(Context context, Activity activity){
         this.mContext = context;
         this.mActivity = activity;
-    }
-
-    // Vibración
-    void vibrar(){
-        Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(800);
     }
 
     // Notificación cuando es detectado pero no sobreapasa el radio.
@@ -39,7 +35,7 @@ public class Notification {
 
         builder.setContentIntent(pendingIntent);
         builder.setSmallIcon(R.drawable.notification);
-        builder.setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
+        builder.setVibrate(new long[]{1000, 1000});
         builder.setAutoCancel(true);
         builder.setContentTitle("¡AVISO!");
         builder.setContentText("El agresor ha sido detectado.");
@@ -61,7 +57,7 @@ public class Notification {
 
         builder.setContentIntent(pendingIntent);
         builder.setSmallIcon(R.drawable.notification);
-        builder.setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
+        builder.setVibrate(new long[]{1000, 1000});
         builder.setAutoCancel(true);
         builder.setContentTitle("¡PELIGRO!");
         builder.setContentText("Distancia límite superada.");

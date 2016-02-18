@@ -4,20 +4,13 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,13 +19,15 @@ public class Inicio extends AppCompatActivity {
 
     private BluetoothConnection bluetooth;
     private PanicButton pbutton;
-    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
+    ScheduledExecutorService executor;
 
     // Constructor
     public Inicio(){
         bluetooth = new BluetoothConnection(Inicio.this, this);
         pbutton = new PanicButton(Inicio.this, this);
+
+        executor = Executors.newScheduledThreadPool(1);
     }
 
     @Override
@@ -49,12 +44,12 @@ public class Inicio extends AppCompatActivity {
         bluetoothFilter.addAction(BluetoothDevice.ACTION_FOUND);
         registerReceiver(bluetooth.getReceiver(), bluetoothFilter);
 
-        // Creamos el botón de pánico en la Activity
-        pbutton.pushButton();
+        pbutton.pushButton(); // Creamos el botón de pánico en la Activity
 
         bluetooth.estaActivado(); // Comprobamos si esta activado el bluetooth y sino, envia mensaje de activacion
 
-        Runnable helloRunnable = new Runnable() {
+        // Ejecutamos el servicio de busqueda de dispositivos bluetooth cada x tiempo
+        Runnable searchB = new Runnable() {
             public void run() {
                 startService(new Intent(Inicio.this, BService.class));
 
@@ -62,7 +57,7 @@ public class Inicio extends AppCompatActivity {
             }
         };
 
-        executor.scheduleAtFixedRate(helloRunnable, 0, 15, TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(searchB, 0, 15, TimeUnit.SECONDS);
     }
 
     @Override
@@ -75,6 +70,7 @@ public class Inicio extends AppCompatActivity {
 
     public boolean onPrepareOptionsMenu(Menu menu) {
 
+        // Mostramos el botón de parar grabación en el menú solo si está grabando
         MenuItem stop = menu.findItem(R.id.stop_video);
         if(bluetooth.getRcamera() != null && bluetooth.getRcamera().getCameraState() == true) {
             stop.setVisible(true);
@@ -99,7 +95,7 @@ public class Inicio extends AppCompatActivity {
 
         if(id == R.id.stop_video){
             if(bluetooth.getRcamera().getCameraState() == true){
-                bluetooth.getRcamera().stopRecording();
+                bluetooth.getRcamera().stopRecording(); // Para de grabar
             }
             else {
                 Toast.makeText(Inicio.this, "No se está grabando.", Toast.LENGTH_SHORT).show();

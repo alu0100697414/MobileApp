@@ -65,7 +65,6 @@ public class RCamera implements SurfaceHolder.Callback {
 
         mrec.setCamera(mCamera);
 
-        mrec.setPreviewDisplay(surfaceHolder.getSurface());
         mrec.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mrec.setAudioSource(MediaRecorder.AudioSource.MIC);
 
