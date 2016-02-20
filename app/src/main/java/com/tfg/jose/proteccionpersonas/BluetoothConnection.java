@@ -89,11 +89,6 @@ public class BluetoothConnection {
                         // Notificación del límite supe
                         notifi.notificar_limite();
 
-                        // Abre la activity, si esta cerrada, con los resultados
-                        Intent intento = new Intent(mContext, Inicio.class);
-                        intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                        mContext.startActivity(intento);
-
                         // Grabación automática si la app está abierta<<<
                         if(mActivity.hasWindowFocus() == true){
                             if(rcamera == null) {
@@ -111,6 +106,12 @@ public class BluetoothConnection {
                                     rcamera.getMrec().release();
                                 }
                             }
+                        }
+                        else {
+                            // Abre la activity, si esta cerrada, con los resultados
+                            Intent intento = new Intent(mContext, Inicio.class);
+                            intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                            mContext.startActivity(intento);
                         }
                     }
 
