@@ -4,16 +4,25 @@
     tools:context="com.tfg.jose.proteccionpersonas.Inicio">
 
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/bluetooth"
+        android:orderInCategory="80"
+        android:title="@string/bluetooth"
+        android:icon="@drawable/ic_bluetooth"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/stop_video"
+        android:id="@+id/video"
         android:orderInCategory="90"
-        android:title="@string/stop_video"
-        android:visible="false"
-        app:showAsAction="never" />
+        android:title="@string/video"
+        android:icon="@drawable/ic_menu_camera"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/contacts"
+        android:icon="@drawable/ic_contact"
+        app:showAsAction="ifRoom" />
 
 </menu>

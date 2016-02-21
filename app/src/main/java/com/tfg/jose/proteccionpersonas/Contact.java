@@ -31,5 +31,4 @@ public class Contact {
     void setId(int num){
         id = num;
     }
-
 }

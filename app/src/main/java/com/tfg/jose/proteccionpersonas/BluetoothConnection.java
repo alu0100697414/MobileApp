@@ -89,30 +89,7 @@ public class BluetoothConnection {
                         // Notificación del límite supe
                         notifi.notificar_limite();
 
-                        // Grabación automática si la app está abierta<<<
-                        if(mActivity.hasWindowFocus() == true){
-                            if(rcamera == null) {
-                                rcamera = new RCamera(mContext,mActivity);
-                            }
-
-                            if(rcamera.getCameraState() == false){
-                                try {
-                                    rcamera.startRecording();
-                                }
-
-                                catch (IOException e) {
-                                    String message = e.getMessage();
-                                    Log.i(null, "Problem Start" + message);
-                                    rcamera.getMrec().release();
-                                }
-                            }
-                        }
-                        else {
-                            // Abre la activity, si esta cerrada, con los resultados
-                            Intent intento = new Intent(mContext, Inicio.class);
-                            intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                            mContext.startActivity(intento);
-                        }
+                        recordON();
                     }
 
                     // Si lo encuentra pero no la supera, se le dice
@@ -179,12 +156,52 @@ public class BluetoothConnection {
 
                     rssi_msg.setText("NO HAY PELIGRO.");
                     rssi_dist.setText("");
+                }
 
-                } else {
+                else if(deviceFound == false && !BTAdapter.isEnabled()){
+                    BTAdapter.cancelDiscovery();
+
+                    mContext.stopService(new Intent(mContext, BService.class));
+
+                    rssi_msg.setText("Bluetooth desactivado.");
+                    rssi_dist.setText("");
+
+                    notifi.bluetooth_desactivado();
+                }
+
+                else {
                     deviceFound = false;
                 }
             }
         }, DELAY);
+    }
+
+    // Grabación automática si la app está abierta<<<
+    void recordON(){
+
+        if(mActivity.hasWindowFocus() == true){
+            if(rcamera == null) {
+                rcamera = new RCamera(mContext,mActivity);
+            }
+
+            if(rcamera.getCameraState() == false){
+                try {
+                    rcamera.startRecording();
+                }
+
+                catch (IOException e) {
+                    String message = e.getMessage();
+                    Log.i(null, "Problem Start" + message);
+                    rcamera.getMrec().release();
+                }
+            }
+        }
+        else {
+            // Abre la activity, si esta cerrada, con los resultados
+            Intent intento = new Intent(mContext, Inicio.class);
+            intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            mContext.startActivity(intento);
+        }
     }
 
     // Devuelve el nombre del dispositivo

@@ -19,6 +19,7 @@ public class Inicio extends AppCompatActivity {
 
     private BluetoothConnection bluetooth;
     private PanicButton pbutton;
+    private Notification notifi;
 
     ScheduledExecutorService executor;
 
@@ -26,6 +27,7 @@ public class Inicio extends AppCompatActivity {
     public Inicio(){
         bluetooth = new BluetoothConnection(Inicio.this, this);
         pbutton = new PanicButton(Inicio.this, this);
+        notifi = new Notification(Inicio.this, this);
 
         executor = Executors.newScheduledThreadPool(1);
     }
@@ -46,14 +48,17 @@ public class Inicio extends AppCompatActivity {
 
         pbutton.pushButton(); // Creamos el botón de pánico en la Activity
 
-        bluetooth.estaActivado(); // Comprobamos si esta activado el bluetooth y sino, envia mensaje de activacion
+        bluetooth.estaActivado();
 
         // Ejecutamos el servicio de busqueda de dispositivos bluetooth cada x tiempo
         Runnable searchB = new Runnable() {
             public void run() {
+
                 startService(new Intent(Inicio.this, BService.class));
 
                 bluetooth.sinPeligro(); // Si tras 12s no lo encuentra, muestra mensaje de que no hay peligro
+
+                invalidateOptionsMenu(); // Refrescamos el menu
             }
         };
 
@@ -70,12 +75,20 @@ public class Inicio extends AppCompatActivity {
 
     public boolean onPrepareOptionsMenu(Menu menu) {
 
-        // Mostramos el botón de parar grabación en el menú solo si está grabando
-        MenuItem stop = menu.findItem(R.id.stop_video);
-        if(bluetooth.getRcamera() != null && bluetooth.getRcamera().getCameraState() == true) {
-            stop.setVisible(true);
+        // Mostramos el botón de activar el bluetooth si no está activado.
+        MenuItem bt = menu.findItem(R.id.bluetooth);
+        if(bluetooth.getBTAdapter().isEnabled()) {
+            bt.setVisible(false);
         } else {
-            stop.setVisible(false);
+            bt.setVisible(true);
+        }
+
+        // Cambiamos el título del botón de la cámara dependiendo de su estado.
+        MenuItem video = menu.findItem(R.id.video);
+        if(bluetooth.getRcamera() != null && bluetooth.getRcamera().getCameraState() == true) {
+            video.setTitle("Parar grabación.");
+        } else {
+            video.setTitle("Iniciar grabación.");
         }
 
         return true;
@@ -93,13 +106,19 @@ public class Inicio extends AppCompatActivity {
             return true;
         }
 
-        if(id == R.id.stop_video){
-            if(bluetooth.getRcamera().getCameraState() == true){
+        if(id == R.id.video){
+            if(bluetooth.getRcamera() != null && bluetooth.getRcamera().getCameraState() == true){
                 bluetooth.getRcamera().stopRecording(); // Para de grabar
+                invalidateOptionsMenu(); // Refrecamos el menú
             }
             else {
-                Toast.makeText(Inicio.this, "No se está grabando.", Toast.LENGTH_SHORT).show();
+                bluetooth.recordON(); // Comienza a grabar
+                invalidateOptionsMenu(); // Refrecamos el menú
             }
+        }
+
+        if(id == R.id.bluetooth){
+            bluetooth.estaActivado();
         }
 
         return super.onOptionsItemSelected(item);
@@ -113,6 +132,8 @@ public class Inicio extends AppCompatActivity {
             System.exit(0); // Reiniciamos la API para que no haya problema a la hora de buscar dispositivos
             this.startActivity(new Intent(this.getApplicationContext(), Inicio.class));
 
+            invalidateOptionsMenu(); // Refrescamos el menú
+
             Toast.makeText(Inicio.this, "Ha activado el Bluetooth.", Toast.LENGTH_SHORT).show();
         }
 
@@ -121,7 +142,12 @@ public class Inicio extends AppCompatActivity {
             TextView rssi_msg = (TextView) this.findViewById(R.id.res_busqueda);
             rssi_msg.setText("Bluetooth desactivado.");
 
-            Toast.makeText(Inicio.this, "No ha activado el Bluetooth.", Toast.LENGTH_SHORT).show();
+            TextView rssi_dist = (TextView) this.findViewById(R.id.res_distancia);
+            rssi_dist.setText("");
+
+            invalidateOptionsMenu(); // Refrecamos el menú
+
+            notifi.bluetooth_desactivado();
         }
     }
 
@@ -130,11 +156,17 @@ public class Inicio extends AppCompatActivity {
         return bluetooth;
     }
 
+    // Devuelve el objeto de las notificaciones
+    Notification getNotifi(){
+        return notifi;
+    }
+
     // Destructor para cuando se cierre el programa
     @Override
     public void onDestroy() {
         super.onDestroy();
 
+        // Paro la cámara si está activa.
         if(bluetooth.getRcamera() != null){
 
             if(bluetooth.getRcamera().getCameraState() == true) {
@@ -147,6 +179,9 @@ public class Inicio extends AppCompatActivity {
         bluetooth.estaBuscando(); // Vuelvo a comprobar que esté parada la busqueda de dispositivos
         unregisterReceiver(bluetooth.getReceiver());
 
-        executor.shutdown();
+
+        if(!executor.isShutdown()){
+            executor.shutdown();
+        }
     }
 }

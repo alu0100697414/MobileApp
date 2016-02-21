@@ -26,6 +26,32 @@ public class Notification {
     }
 
     // Notificación cuando es detectado pero no sobreapasa el radio.
+    void bluetooth_desactivado(){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+
+        Intent intent = new Intent(mContext, Inicio.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
+
+        builder.setContentIntent(pendingIntent);
+        builder.setSmallIcon(R.drawable.notification);
+        builder.setAutoCancel(true);
+        builder.setOngoing(true);
+        builder.setContentTitle("¡AVISO!");
+        builder.setContentText("Bluetooth desactivado.");
+
+        String texto = "Por favor, acceda a la aplicación pulsando sobre esta notificación, ya que el bluetooth está desactivado " +
+                "y corre peligro de que el agresor esté cerca.";
+        builder.setStyle(new NotificationCompat.BigTextStyle().bigText(texto));
+
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        builder.setSound(alarmSound);
+
+        NotificationManager notificationManager = (NotificationManager) mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(1, builder.build());
+    }
+
+    // Notificación cuando es detectado pero no sobreapasa el radio.
     void notificar_radio(){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
 

@@ -22,8 +22,10 @@ public class BService extends Service {
     @Override
     public int onStartCommand(Intent intenc, int flags, int idArranque) {
 
-        inicio.getBluetoothConnection().estaBuscando(); // Si esta buscando, para la busqueda
-        inicio.getBluetoothConnection().buscar(); // Inicia la busqueda
+        if(inicio.getBluetoothConnection().getBTAdapter().isEnabled()){
+            inicio.getBluetoothConnection().estaBuscando(); // Si esta buscando, para la busqueda
+            inicio.getBluetoothConnection().buscar(); // Inicia la busqueda
+        }
 
         return START_STICKY;
     }

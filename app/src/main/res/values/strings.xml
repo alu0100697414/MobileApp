@@ -2,8 +2,11 @@
     <string name="app_name">ProtectULL</string>
     <string name="action_settings">Configuración</string>
     <string name="app_title">Protección de Personas</string>
+    <string name="bluetooth">Activar Bluetooth</string>
     <string name="buscando">Buscando...</string>
-    <string name="stop_video">Parar grabación</string>
+    <string name="contacts">Contactos</string>
+    <string name="video">Grabación</string>
     <string name="Titulo">Datos del dispositivo del agresor</string>
     <string name="Titulo_Encontrado">Estado</string>
+    <string name="title_activity_contact_">Contact_Activity</string>
 </resources>
