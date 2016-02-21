@@ -13,6 +13,9 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by jose on 29/01/16.
@@ -36,6 +39,8 @@ public class BluetoothConnection {
 
     private double px;  // Valor de intensidad de señal entre dos dispositivos a un metro de distancia.
 
+    ScheduledExecutorService pausa;
+
     // El adaptador bluetooth tiene que ser final y por tanto inicializado aquí
     private final BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -53,6 +58,9 @@ public class BluetoothConnection {
         this.nombre_dispositivo = "jose-TravelMate-5742-0";
         this.direccion_dispositivo = "00:15:83:E4:D7:86";
         this.distancia_limite = 10;
+
+        this.pausa = Executors.newScheduledThreadPool(1);
+
     }
 
     // Se llama al receiver cada vez que encuentra un dispositivo nuevo
@@ -89,7 +97,38 @@ public class BluetoothConnection {
                         // Notificación del límite supe
                         notifi.notificar_limite();
 
-                        recordON();
+                        // Abre la activity, si esta cerrada, con los resultados
+                        if(mActivity.hasWindowFocus() == false) {
+                            Intent intento = new Intent(mContext, Inicio.class);
+                            intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                            mContext.startActivity(intento);
+                        }
+                        
+                        Runnable waitForFocus = new Runnable() {
+                            public void run() {
+                                if(mActivity.hasWindowFocus() == true){
+                                    if(rcamera == null) {
+                                        rcamera = new RCamera(mContext,mActivity);
+                                    }
+
+                                    if(rcamera.getCameraState() == false){
+                                        try {
+                                            rcamera.startRecording();
+                                        }
+
+                                        catch (IOException e) {
+                                            String message = e.getMessage();
+                                            Log.i(null, "Problem Start" + message);
+                                            rcamera.getMrec().release();
+                                        }
+                                    }
+
+                                    pausa.shutdown();
+                                }
+                            }
+                        };
+
+                        pausa.scheduleAtFixedRate(waitForFocus, 0, 1, TimeUnit.SECONDS);
                     }
 
                     // Si lo encuentra pero no la supera, se le dice
@@ -174,34 +213,6 @@ public class BluetoothConnection {
                 }
             }
         }, DELAY);
-    }
-
-    // Grabación automática si la app está abierta<<<
-    void recordON(){
-
-        if(mActivity.hasWindowFocus() == true){
-            if(rcamera == null) {
-                rcamera = new RCamera(mContext,mActivity);
-            }
-
-            if(rcamera.getCameraState() == false){
-                try {
-                    rcamera.startRecording();
-                }
-
-                catch (IOException e) {
-                    String message = e.getMessage();
-                    Log.i(null, "Problem Start" + message);
-                    rcamera.getMrec().release();
-                }
-            }
-        }
-        else {
-            // Abre la activity, si esta cerrada, con los resultados
-            Intent intento = new Intent(mContext, Inicio.class);
-            intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            mContext.startActivity(intento);
-        }
     }
 
     // Devuelve el nombre del dispositivo
