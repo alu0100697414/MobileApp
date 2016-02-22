@@ -5,6 +5,7 @@
     <string name="bluetooth">Activar Bluetooth</string>
     <string name="buscando">Buscando...</string>
     <string name="contacts">Contactos</string>
+    <string name="exit">Cerrar aplicación</string>
     <string name="video">Grabación</string>
     <string name="Titulo">Datos del dispositivo del agresor</string>
     <string name="Titulo_Encontrado">Estado</string>

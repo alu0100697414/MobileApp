@@ -19,10 +19,16 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_contactos"
         android:orderInCategory="100"
         android:title="@string/contacts"
         android:icon="@drawable/ic_contact"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_exit"
+        android:orderInCategory="120"
+        android:title="@string/exit"
+        app:showAsAction="never" />
 
 </menu>

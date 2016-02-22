@@ -1,11 +1,14 @@
 package com.tfg.jose.proteccionpersonas;
 
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -65,6 +68,15 @@ public class Inicio extends AppCompatActivity {
         executor.scheduleAtFixedRate(searchB, 0, 15, TimeUnit.SECONDS);
     }
 
+    // Si se pulsa el botón de atrás, sigue ejecutándose la app
+    @Override
+    public void onBackPressed() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -96,15 +108,14 @@ public class Inicio extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_contactos) {
             return true;
         }
+
 
         if(id == R.id.video){
             if(bluetooth.getRcamera() != null && bluetooth.getRcamera().getCameraState() == true){
@@ -117,8 +128,29 @@ public class Inicio extends AppCompatActivity {
             }
         }
 
+        // Activa el bluetooth
         if(id == R.id.bluetooth){
             bluetooth.estaActivado();
+        }
+
+        // Botón para cerrar la app.
+        if(id == R.id.action_exit){
+            // Muestro alerta para confirmación.
+            new AlertDialog.Builder(this)
+                    .setTitle("¡AVISO!")
+                    .setMessage("Si cierra la app, quedará desprotegid@.")
+                    .setNegativeButton(android.R.string.no, null)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            Intent intent = new Intent(Intent.ACTION_MAIN);
+                            intent.addCategory(Intent.CATEGORY_HOME);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                            finish();
+                            System.exit(0); // Salimos si acepta el dialogo
+                        }
+                    }).create().show();
         }
 
         return super.onOptionsItemSelected(item);
