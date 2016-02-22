@@ -98,17 +98,6 @@ public class BluetoothConnection {
                         // Notificación del límite supe
                         notifi.notificar_limite();
 
-//                        // Abre la activity, si esta cerrada, con los resultados
-//                        if(mActivity.hasWindowFocus() == false) {
-//                            Intent intento = new Intent(mContext, Inicio.class);
-//                            intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//                            mContext.startActivity(intento);
-//                        }
-//
-//                        else {
-//                            recordON();
-//                        }
-
                         // Abre la activity, si esta cerrada, con los resultados
                         if(mActivity.hasWindowFocus() == false) {
                             Intent intento = new Intent(mContext, Inicio.class);
@@ -160,6 +149,8 @@ public class BluetoothConnection {
                     // Finalizamos la búsqueda si lo encontramos
                     BTAdapter.cancelDiscovery();
                     mContext.stopService(new Intent(mContext, BService.class));
+
+                    mActivity.invalidateOptionsMenu(); // Refrescamos el menú
                 }
 
             }
@@ -226,6 +217,8 @@ public class BluetoothConnection {
             public void run() {
                 TextView rssi_msg = (TextView) mActivity.findViewById(R.id.res_busqueda);
                 TextView rssi_dist = (TextView) mActivity.findViewById(R.id.res_distancia);
+
+                mActivity.invalidateOptionsMenu(); // Refrescamos el menu
 
                 if (deviceFound == false && BTAdapter.isEnabled()) {
                     BTAdapter.cancelDiscovery();
