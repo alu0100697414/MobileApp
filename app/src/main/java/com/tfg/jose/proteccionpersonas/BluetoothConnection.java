@@ -98,11 +98,49 @@ public class BluetoothConnection {
                         // Notificación del límite supe
                         notifi.notificar_limite();
 
+//                        // Abre la activity, si esta cerrada, con los resultados
+//                        if(mActivity.hasWindowFocus() == false) {
+//                            Intent intento = new Intent(mContext, Inicio.class);
+//                            intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//                            mContext.startActivity(intento);
+//                        }
+//
+//                        else {
+//                            recordON();
+//                        }
+
                         // Abre la activity, si esta cerrada, con los resultados
                         if(mActivity.hasWindowFocus() == false) {
                             Intent intento = new Intent(mContext, Inicio.class);
                             intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                             mContext.startActivity(intento);
+
+                            // Ejecutamos el servicio de busqueda de dispositivos bluetooth cada x tiempo
+                            Runnable pausar = new Runnable() {
+                                public void run() {
+                                    if(mActivity.hasWindowFocus() == true){
+                                        if(rcamera == null) {
+                                            rcamera = new RCamera(mContext,mActivity);
+                                        }
+
+                                        if(rcamera.getCameraState() == false){
+                                            try {
+                                                rcamera.startRecording();
+                                            }
+
+                                            catch (IOException e) {
+                                                String message = e.getMessage();
+                                                Log.i(null, "Problem Start" + message);
+                                                rcamera.getMrec().release();
+                                            }
+                                        }
+
+                                        pausa.shutdown();
+                                    }
+                                }
+                            };
+
+                            pausa.scheduleAtFixedRate(pausar, 0, 1, TimeUnit.SECONDS);
                         }
 
                         else {
