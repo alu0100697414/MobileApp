@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -103,32 +104,10 @@ public class BluetoothConnection {
                             intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                             mContext.startActivity(intento);
                         }
-                        
-                        Runnable waitForFocus = new Runnable() {
-                            public void run() {
-                                if(mActivity.hasWindowFocus() == true){
-                                    if(rcamera == null) {
-                                        rcamera = new RCamera(mContext,mActivity);
-                                    }
 
-                                    if(rcamera.getCameraState() == false){
-                                        try {
-                                            rcamera.startRecording();
-                                        }
-
-                                        catch (IOException e) {
-                                            String message = e.getMessage();
-                                            Log.i(null, "Problem Start" + message);
-                                            rcamera.getMrec().release();
-                                        }
-                                    }
-
-                                    pausa.shutdown();
-                                }
-                            }
-                        };
-
-                        pausa.scheduleAtFixedRate(waitForFocus, 0, 1, TimeUnit.SECONDS);
+                        else {
+                            recordON();
+                        }
                     }
 
                     // Si lo encuentra pero no la supera, se le dice
@@ -153,6 +132,28 @@ public class BluetoothConnection {
     double getDistance(double rssi, double txPower) {
         // El 4 es el valor de n y si no hay obstáculos de por medio se usa el valor 2
         return Math.pow(10d, ((double) txPower - rssi) / (10 * 4));
+    }
+
+    void recordON(){
+        if(mActivity.hasWindowFocus() == true){
+            if(rcamera == null) {
+                rcamera = new RCamera(mContext,mActivity);
+            }
+
+            if(rcamera.getCameraState() == false){
+                mActivity.invalidateOptionsMenu(); // Refrecamos el menú
+
+                try {
+                    rcamera.startRecording();
+                }
+
+                catch (IOException e) {
+                    String message = e.getMessage();
+                    Log.i(null, "Problem Start" + message);
+                    rcamera.getMrec().release();
+                }
+            }
+        }
     }
 
     // Si está desactivado el Bluetooth, enviamos mensaje para activarlo
