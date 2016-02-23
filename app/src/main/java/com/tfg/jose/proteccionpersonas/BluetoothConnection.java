@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -40,8 +42,6 @@ public class BluetoothConnection {
 
     private double px;  // Valor de intensidad de señal entre dos dispositivos a un metro de distancia.
 
-    ScheduledExecutorService pausa;
-
     // El adaptador bluetooth tiene que ser final y por tanto inicializado aquí
     private final BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -59,9 +59,6 @@ public class BluetoothConnection {
         this.nombre_dispositivo = "jose-TravelMate-5742-0";
         this.direccion_dispositivo = "00:15:83:E4:D7:86";
         this.distancia_limite = 10;
-
-        this.pausa = Executors.newScheduledThreadPool(1);
-
     }
 
     // Se llama al receiver cada vez que encuentra un dispositivo nuevo
@@ -104,8 +101,8 @@ public class BluetoothConnection {
                             intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                             mContext.startActivity(intento);
 
-                            // Ejecutamos el servicio de busqueda de dispositivos bluetooth cada x tiempo
-                            Runnable pausar = new Runnable() {
+                            final Timer pausar = new Timer(true);
+                            pausar.scheduleAtFixedRate(new TimerTask() {
                                 public void run() {
                                     if(mActivity.hasWindowFocus() == true){
                                         if(rcamera == null) {
@@ -124,12 +121,11 @@ public class BluetoothConnection {
                                             }
                                         }
 
-                                        pausa.shutdown();
+                                        pausar.cancel();
                                     }
                                 }
-                            };
+                            }, 0, 1000);
 
-                            pausa.scheduleAtFixedRate(pausar, 0, 1, TimeUnit.SECONDS);
                         }
 
                         else {
