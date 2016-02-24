@@ -14,4 +14,6 @@
     <string name="title_activity_contact_">Contact_Activity</string>
     <string name="title_activity_contact_list">Contactos</string>
     <string name="listado_title">Listado a avisar:</string>
+    <string name="nuevo">Nuevo</string>
+    <string name="existente">Existente</string>
 </resources>

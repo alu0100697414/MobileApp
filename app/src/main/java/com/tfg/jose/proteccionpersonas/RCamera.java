@@ -77,12 +77,6 @@ public class RCamera implements SurfaceHolder.Callback {
 
         mrec.prepare();
         mrec.start();
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                Toast.makeText(mActivity, "Ha comenzado una grabación.", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     // Funcion para parar de grabar
@@ -91,8 +85,6 @@ public class RCamera implements SurfaceHolder.Callback {
 
         mrec.stop();
         mrec.release();
-
-        Toast.makeText(mContext, "La grabación ha sido almacenada.", Toast.LENGTH_SHORT).show();
     }
 
     void stopCamera(){

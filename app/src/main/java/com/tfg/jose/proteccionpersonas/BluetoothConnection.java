@@ -121,7 +121,7 @@ public class BluetoothConnection {
                                         pausar.cancel();
                                     }
                                 }
-                            }, 0, 1000);
+                            }, 0, 100);
 
                         }
 
