@@ -11,4 +11,5 @@
     <string name="Titulo">Datos del dispositivo del agresor</string>
     <string name="Titulo_Encontrado">Estado</string>
     <string name="title_activity_contact_">Contact_Activity</string>
+    <string name="title_activity_contact_list">Notificar a</string>
 </resources>

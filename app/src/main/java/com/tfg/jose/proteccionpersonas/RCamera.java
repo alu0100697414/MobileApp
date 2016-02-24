@@ -83,10 +83,6 @@ public class RCamera implements SurfaceHolder.Callback {
                 Toast.makeText(mActivity, "Ha comenzado una grabación.", Toast.LENGTH_SHORT).show();
             }
         });
-
-        TextView grabando = (TextView) mActivity.findViewById(R.id.grabando);
-        grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
-        grabando.setVisibility(View.VISIBLE);
     }
 
     // Funcion para parar de grabar
@@ -97,10 +93,6 @@ public class RCamera implements SurfaceHolder.Callback {
         mrec.release();
 
         Toast.makeText(mContext, "La grabación ha sido almacenada.", Toast.LENGTH_SHORT).show();
-
-        TextView grabando = (TextView) mActivity.findViewById(R.id.grabando);
-        grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
-        grabando.setVisibility(View.INVISIBLE);
     }
 
     void stopCamera(){

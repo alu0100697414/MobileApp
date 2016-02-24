@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -112,7 +113,7 @@ public class Inicio extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_contactos) {
-            return true;
+            startActivity(new Intent(Inicio.this,ContactList.class));
         }
 
 
@@ -120,10 +121,18 @@ public class Inicio extends AppCompatActivity {
             if(bluetooth.getRcamera() != null && bluetooth.getRcamera().getCameraState() == true){
                 bluetooth.getRcamera().stopRecording(); // Para de grabar
                 invalidateOptionsMenu(); // Refrecamos el menú
+
+                TextView grabando = (TextView) findViewById(R.id.grabando);
+                grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
+                grabando.setVisibility(View.INVISIBLE);
             }
             else {
                 bluetooth.recordON(); // Comienza a grabar
                 invalidateOptionsMenu(); // Refrecamos el menú
+
+                TextView grabando = (TextView) findViewById(R.id.grabando);
+                grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
+                grabando.setVisibility(View.VISIBLE);
             }
         }
 

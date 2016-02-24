@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -127,6 +128,10 @@ public class BluetoothConnection {
                         else {
                             recordON();
                         }
+
+                        TextView grabando = (TextView) mActivity.findViewById(R.id.grabando);
+                        grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
+                        grabando.setVisibility(View.VISIBLE);
                     }
 
                     // Si lo encuentra pero no la supera, se le dice
