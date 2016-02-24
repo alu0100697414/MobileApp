@@ -9,26 +9,26 @@ package com.tfg.jose.proteccionpersonas;
 public class Contact {
 
     private String name;
-    private int id;
+    private String telefono;
 
-    public Contact(int num, String nm){
+    public Contact(String nm, String num){
         name = nm;
-        id = num;
+        telefono = num;
     }
 
     String getName(){
         return name;
     }
 
-    int getId(){
-        return id;
+    String getNumber(){
+        return telefono;
     }
 
     void setName(String nm){
         name = nm;
     }
 
-    void setId(int num){
-        id = num;
+    void setNumber(String num){
+        telefono = num;
     }
 }

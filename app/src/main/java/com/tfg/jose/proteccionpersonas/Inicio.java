@@ -98,9 +98,9 @@ public class Inicio extends AppCompatActivity {
         // Cambiamos el título del botón de la cámara dependiendo de su estado.
         MenuItem video = menu.findItem(R.id.video);
         if(bluetooth.getRcamera() != null && bluetooth.getRcamera().getCameraState() == true) {
-            video.setTitle("Parar grabación.");
+            video.setTitle("Parar grabación");
         } else {
-            video.setTitle("Iniciar grabación.");
+            video.setTitle("Iniciar grabación");
         }
 
         return true;

@@ -12,4 +12,20 @@
     tools:context="com.tfg.jose.proteccionpersonas.ContactList"
     tools:showIn="@layout/activity_contact_list">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/titulo_listado"
+        android:text="@string/listado_title"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lista_contactos"
+        android:layout_below="@+id/titulo_listado"
+        android:layout_marginTop="15dp">
+    </ListView>
+
 </RelativeLayout>
