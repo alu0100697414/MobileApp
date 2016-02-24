@@ -98,4 +98,23 @@ public class Notification {
         notificationManager.notify(1, builder.build());
     }
 
+    // Notificación cuando sobrepasa el radio.
+    void notificar_grabacion(){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+
+
+
+        Intent intent = new Intent(mContext, Inicio.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
+
+        builder.setContentIntent(pendingIntent);
+        builder.setSmallIcon(R.drawable.grabando);
+        builder.setAutoCancel(true);
+        builder.setContentTitle("Grabando...");
+        builder.setContentText("Grabación en curso.");
+
+        NotificationManager notificationManager = (NotificationManager) mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(1, builder.build());
+    }
 }

@@ -10,15 +10,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by jose on 29/01/16.

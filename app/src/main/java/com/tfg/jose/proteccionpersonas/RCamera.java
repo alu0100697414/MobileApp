@@ -8,6 +8,7 @@ import android.media.MediaRecorder;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -81,7 +82,12 @@ public class RCamera implements SurfaceHolder.Callback {
             public void run() {
                 Toast.makeText(mActivity, "Ha comenzado una grabación.", Toast.LENGTH_SHORT).show();
             }
-        });    }
+        });
+
+        TextView grabando = (TextView) mActivity.findViewById(R.id.grabando);
+        grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
+        grabando.setVisibility(View.VISIBLE);
+    }
 
     // Funcion para parar de grabar
     protected void stopRecording() {
@@ -91,6 +97,10 @@ public class RCamera implements SurfaceHolder.Callback {
         mrec.release();
 
         Toast.makeText(mContext, "La grabación ha sido almacenada.", Toast.LENGTH_SHORT).show();
+
+        TextView grabando = (TextView) mActivity.findViewById(R.id.grabando);
+        grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
+        grabando.setVisibility(View.INVISIBLE);
     }
 
     void stopCamera(){

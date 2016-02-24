@@ -59,4 +59,18 @@
         android:layout_alignParentLeft="true"
         android:layout_alignLeft="@+id/panicButton" />
 
+    <TextView
+        android:id="@+id/grabando"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:drawablePadding="8dp"
+        android:singleLine="true"
+        android:layout_below="@+id/panicButton"
+        android:layout_marginTop="50dp"
+        android:textSize="20dp"
+        android:visibility="invisible"
+        android:textColor="@color/negro"
+        android:text="@string/grabando"/>
+
 </RelativeLayout>
