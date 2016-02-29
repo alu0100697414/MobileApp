@@ -16,4 +16,7 @@
     <string name="listado_title">Listado a avisar:</string>
     <string name="nuevo">Nuevo</string>
     <string name="existente">Existente</string>
+    <string name="numero_contacto">Número</string>
+    <string name="nombre_contacto">Nombre</string>
+
 </resources>
