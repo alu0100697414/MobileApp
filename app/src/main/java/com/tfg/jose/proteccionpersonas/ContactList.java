@@ -14,17 +14,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class ContactList extends AppCompatActivity {
 
+    private int PICK_CONTACT_REQUEST;
+
     private ContactArrayAdapter adaptador;
-    private int PICK_CONTACT_REQUEST = 1;
     private ArrayList<Contact> contactos;
     private ListView list;
 
+    private DBase protectULLDB;
+
+    // Contructor
     public ContactList(){
         this.PICK_CONTACT_REQUEST = 1;
         this.contactos = new ArrayList<Contact>();
@@ -37,10 +40,17 @@ public class ContactList extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Inicializamos la base de datos
+        protectULLDB = new DBase(getApplicationContext());
+
+        // Iniciamos el adaptador
         this.adaptador = new ContactArrayAdapter(this, android.R.layout.simple_list_item_1, contactos);
 
         this.list = (ListView) findViewById(R.id.lista_contactos);
         list.setAdapter(adaptador);
+
+        // Cargamos los contactos en la lista
+        mostrarContactos();
 
         // Botón flotante
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -57,7 +67,7 @@ public class ContactList extends AppCompatActivity {
 
                             public void onClick(DialogInterface arg0, int arg1) {
                                 LayoutInflater factory = LayoutInflater.from(ContactList.this);
-                                
+
                                 final View textEntryView = factory.inflate(R.layout.add_contact_dialog, null);
 
                                 final EditText input1 = (EditText) textEntryView.findViewById(R.id.contact_name);
@@ -67,25 +77,24 @@ public class ContactList extends AppCompatActivity {
                                 alert.setTitle("Nuevo contacto").setView(textEntryView)
                                         .setPositiveButton("AÑADIR",
                                                 new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog,
-                                                                        int whichButton) {
+                                                    public void onClick(DialogInterface dialog, int whichButton) {
 
-                                                        contactos.add(new Contact(input1.getText().toString(), input2.getText().toString()));
-
+                                                        protectULLDB.insertarCONTACTO(input2.getText().toString(), input1.getText().toString());
+                                                        mostrarContactos();
                                                     }
-                                                }).setNegativeButton("CANCELAR",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog,
-                                                                int whichButton) {
+                                                })
+                                        .setNegativeButton("CANCELAR",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int whichButton) {
                                              /*
                                              * User clicked cancel so do some stuff
                                              */
-                                            }
-                                        });
+                                                    }
+                                                });
                                 alert.show();
 
                             }
-                        })
+                        }) // Fin del dialogo crear nuevo usuario
 
                         // Añadimos un contacto de la lista de contactos del móvil.
                         .setPositiveButton(R.string.existente, new DialogInterface.OnClickListener() {
@@ -99,6 +108,7 @@ public class ContactList extends AppCompatActivity {
                         }).create().show();
             }
         });
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -128,11 +138,23 @@ public class ContactList extends AppCompatActivity {
                 int column_numero = cursor_numero.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
                 String numero_telefono = cursor_numero.getString(column_numero);
 
-                Toast.makeText(ContactList.this, nombre_contacto + " - " + numero_telefono, Toast.LENGTH_SHORT).show();
-
-                contactos.add(new Contact(nombre_contacto, numero_telefono));
-                adaptador.notifyDataSetChanged();
+                // Añadimos el contacto a la base de datos.
+                protectULLDB.insertarCONTACTO(numero_telefono, nombre_contacto);
+                mostrarContactos();
             }
+        }
+    }
+
+    // Carga en el array adapter los contactos que se encuentran en la base de datos.
+    public void mostrarContactos(){
+
+        if(!adaptador.isEmpty()){
+            adaptador.clear();
+        }
+
+        for (int i = 0; i < protectULLDB.recuperarCONTACTOS().size(); i++) {
+            adaptador.add(new Contact(protectULLDB.recuperarCONTACTOS().get(i).getName(), protectULLDB.recuperarCONTACTOS().get(i).getNumber()));
+            adaptador.notifyDataSetChanged();
         }
     }
 
