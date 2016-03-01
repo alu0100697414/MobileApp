@@ -51,7 +51,7 @@ public class ContactList extends AppCompatActivity {
 
         // Cargamos los contactos en la lista
         mostrarContactos();
-
+        
         // Botón flotante
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setBackgroundTintList(getResources().getColorStateList(R.color.azulito));

@@ -37,6 +37,7 @@ public class DBase extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    // Inserta un contacto nuevo
     public void insertarCONTACTO(String tlf, String nom) {
         SQLiteDatabase db = getWritableDatabase();
         if(db != null){
@@ -48,12 +49,14 @@ public class DBase extends SQLiteOpenHelper {
         }
     }
 
+    // Borra un contacto
     public void borrarCONTACTO(String tlf) {
         SQLiteDatabase db = getWritableDatabase();
         db.delete("contactos", "telefono=" + tlf, null);
         db.close();
     }
 
+    // Devuelve un contacto
     public Contact recuperarCONTACTO(String tlf) {
         SQLiteDatabase db = getReadableDatabase();
         String[] valores_recuperar = {"telefono", "nombre"};
@@ -68,6 +71,7 @@ public class DBase extends SQLiteOpenHelper {
         return contactos;
     }
 
+    // Devuelve todos los contactos
     public List<Contact> recuperarCONTACTOS() {
 
         SQLiteDatabase db = getReadableDatabase();
