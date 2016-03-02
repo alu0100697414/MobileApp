@@ -10,8 +10,10 @@ import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -51,7 +53,7 @@ public class ContactList extends AppCompatActivity {
 
         // Cargamos los contactos en la lista
         mostrarContactos();
-        
+
         // Botón flotante
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setBackgroundTintList(getResources().getColorStateList(R.color.azulito));
@@ -62,7 +64,7 @@ public class ContactList extends AppCompatActivity {
                 new AlertDialog.Builder(ContactList.this)
                         .setTitle("Añadir contacto")
                         .setMessage("Añada un contacto a su lista de avisos.")
-                        // Creamos nuevo dialogo para crear un nuevo contacto
+                                // Creamos nuevo dialogo para crear un nuevo contacto
                         .setNegativeButton(R.string.nuevo, new DialogInterface.OnClickListener() {
 
                             public void onClick(DialogInterface arg0, int arg1) {
@@ -96,7 +98,7 @@ public class ContactList extends AppCompatActivity {
                             }
                         }) // Fin del dialogo crear nuevo usuario
 
-                        // Añadimos un contacto de la lista de contactos del móvil.
+                                // Añadimos un contacto de la lista de contactos del móvil.
                         .setPositiveButton(R.string.existente, new DialogInterface.OnClickListener() {
 
                             public void onClick(DialogInterface arg0, int arg1) {
@@ -106,6 +108,30 @@ public class ContactList extends AppCompatActivity {
                                 startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
                             }
                         }).create().show();
+            }
+        });
+
+        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                Contact cont = (Contact) list.getItemAtPosition(position);
+                Log.v("HELLO", cont.getNumber());
+
+                String[] opc = new String[]{"Eliminar"};
+                AlertDialog opciones = new AlertDialog.Builder(ContactList.this)
+                        .setItems(opc, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int selected) {
+                                if (selected == 0) { // Eliminar
+                                    Contact con = (Contact) list.getItemAtPosition(position);
+                                    protectULLDB.borrarCONTACTO(con.getNumber());
+                                    mostrarContactos();
+                                }
+                            }
+                        }).create();
+                opciones.show();
+
+                return true;
             }
         });
 

@@ -19,7 +19,7 @@ public class DBase extends SQLiteOpenHelper {
 
     private static final String NOMBRE_BASEDATOS = "protectULL.db";
     private static final String TABLA_CONTACTOS = "CREATE TABLE contactos (telefono TEXT PRIMARY KEY, nombre TEXT)";
-    private static final int VERSION_BASEDATOS = 1;
+    private static final int VERSION_BASEDATOS = 2;
 
     // Constructor de la clase
     public DBase(Context context) {
@@ -39,6 +39,9 @@ public class DBase extends SQLiteOpenHelper {
 
     // Inserta un contacto nuevo
     public void insertarCONTACTO(String tlf, String nom) {
+        tlf = tlf.replace(" ","");
+        tlf = tlf.replace("+34","");
+
         SQLiteDatabase db = getWritableDatabase();
         if(db != null){
             ContentValues valores = new ContentValues();
@@ -60,7 +63,7 @@ public class DBase extends SQLiteOpenHelper {
     public Contact recuperarCONTACTO(String tlf) {
         SQLiteDatabase db = getReadableDatabase();
         String[] valores_recuperar = {"telefono", "nombre"};
-        Cursor c = db.query("contactos", valores_recuperar, "id=" + tlf, null, null, null, null, null);
+        Cursor c = db.query("contactos", valores_recuperar, "telefono=" + tlf, null, null, null, null, null);
         if(c != null) {
             c.moveToFirst();
         }
@@ -78,12 +81,15 @@ public class DBase extends SQLiteOpenHelper {
         List<Contact> lista_contactos = new ArrayList<Contact>();
         String[] valores_recuperar = {"telefono", "nombre"};
         Cursor c = db.query("contactos", valores_recuperar, null, null, null, null, null, null);
+
         c.moveToFirst();
 
-        do {
-            Contact contactos = new Contact(c.getString(1), c.getString(0));
-            lista_contactos.add(contactos);
-        } while (c.moveToNext());
+        if(c.getCount() != 0){
+            do {
+                Contact contactos = new Contact(c.getString(1), c.getString(0));
+                lista_contactos.add(contactos);
+            } while (c.moveToNext());
+        }
 
         db.close();
         c.close();
