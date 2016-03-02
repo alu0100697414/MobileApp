@@ -10,10 +10,12 @@ public class Contact {
 
     private String name;
     private String telefono;
+    private int activo;
 
-    public Contact(String nm, String num){
+    public Contact(String nm, String num, int act){
         name = nm;
         telefono = num;
+        activo = act;
     }
 
     String getName(){
@@ -24,11 +26,19 @@ public class Contact {
         return telefono;
     }
 
+    int getActivo(){
+        return activo;
+    }
+
     void setName(String nm){
         name = nm;
     }
 
     void setNumber(String num){
         telefono = num;
+    }
+
+    void setActivo(int act){
+        activo = act;
     }
 }

@@ -41,8 +41,8 @@ public class ContactArrayAdapter extends ArrayAdapter<Contact> {
         TextView nombre = (TextView) item.findViewById(R.id.contacto_nombre);
         nombre.setText(list.get(position).getName());
 
-        TextView numero = (TextView) item.findViewById(R.id.contacto_numero);
-        numero.setText("(" + list.get(position).getNumber() + ")");
+//        TextView numero = (TextView) item.findViewById(R.id.contacto_numero);
+//        numero.setText("(" + list.get(position).getActivo() + ")");
 
         return item;
     }

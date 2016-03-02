@@ -81,7 +81,7 @@ public class ContactList extends AppCompatActivity {
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int whichButton) {
 
-                                                        protectULLDB.insertarCONTACTO(input2.getText().toString(), input1.getText().toString());
+                                                        protectULLDB.insertarCONTACTO(input2.getText().toString(), input1.getText().toString(),1);
                                                         mostrarContactos();
                                                     }
                                                 })
@@ -117,7 +117,7 @@ public class ContactList extends AppCompatActivity {
                 Contact cont = (Contact) list.getItemAtPosition(position);
                 Log.v("HELLO", cont.getNumber());
 
-                String[] opc = new String[]{"Eliminar"};
+                String[] opc = new String[]{"Eliminar contacto"};
                 AlertDialog opciones = new AlertDialog.Builder(ContactList.this)
                         .setItems(opc, new DialogInterface.OnClickListener() {
                             @Override
@@ -165,7 +165,7 @@ public class ContactList extends AppCompatActivity {
                 String numero_telefono = cursor_numero.getString(column_numero);
 
                 // Añadimos el contacto a la base de datos.
-                protectULLDB.insertarCONTACTO(numero_telefono, nombre_contacto);
+                protectULLDB.insertarCONTACTO(numero_telefono, nombre_contacto, 1);
                 mostrarContactos();
             }
         }
@@ -178,9 +178,11 @@ public class ContactList extends AppCompatActivity {
             adaptador.clear();
         }
 
-        for (int i = 0; i < protectULLDB.recuperarCONTACTOS().size(); i++) {
-            adaptador.add(new Contact(protectULLDB.recuperarCONTACTOS().get(i).getName(), protectULLDB.recuperarCONTACTOS().get(i).getNumber()));
-            adaptador.notifyDataSetChanged();
+        if(protectULLDB.recuperarCONTACTOS().size() != 0){
+            for (int i = 0; i < protectULLDB.recuperarCONTACTOS().size(); i++) {
+                adaptador.add(new Contact(protectULLDB.recuperarCONTACTOS().get(i).getName(), protectULLDB.recuperarCONTACTOS().get(i).getNumber(), protectULLDB.recuperarCONTACTOS().get(i).getActivo()));
+                adaptador.notifyDataSetChanged();
+            }
         }
     }
 

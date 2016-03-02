@@ -18,12 +18,14 @@ import java.util.List;
 public class DBase extends SQLiteOpenHelper {
 
     private static final String NOMBRE_BASEDATOS = "protectULL.db";
-    private static final String TABLA_CONTACTOS = "CREATE TABLE contactos (telefono TEXT PRIMARY KEY, nombre TEXT)";
+    private static final String TABLA_CONTACTOS = "CREATE TABLE contactos (telefono TEXT PRIMARY KEY, nombre TEXT, activo INTEGER)";
     private static final int VERSION_BASEDATOS = 2;
 
     // Constructor de la clase
     public DBase(Context context) {
         super(context, NOMBRE_BASEDATOS, null, VERSION_BASEDATOS);
+
+        //context.deleteDatabase(NOMBRE_BASEDATOS); // Borra la base de datos
     }
 
     @Override
@@ -38,7 +40,7 @@ public class DBase extends SQLiteOpenHelper {
     }
 
     // Inserta un contacto nuevo
-    public void insertarCONTACTO(String tlf, String nom) {
+    public void insertarCONTACTO(String tlf, String nom, int act) {
         tlf = tlf.replace(" ","");
         tlf = tlf.replace("+34","");
 
@@ -47,6 +49,7 @@ public class DBase extends SQLiteOpenHelper {
             ContentValues valores = new ContentValues();
             valores.put("telefono", tlf);
             valores.put("nombre", nom);
+            valores.put("activo", act);
             db.insert("contactos", null, valores);
             db.close();
         }
@@ -67,7 +70,7 @@ public class DBase extends SQLiteOpenHelper {
         if(c != null) {
             c.moveToFirst();
         }
-        Contact contactos = new Contact(c.getString(1), c.getString(0));
+        Contact contactos = new Contact(c.getString(1), c.getString(0), c.getInt(2));
         db.close();
         c.close();
 
@@ -79,14 +82,14 @@ public class DBase extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getReadableDatabase();
         List<Contact> lista_contactos = new ArrayList<Contact>();
-        String[] valores_recuperar = {"telefono", "nombre"};
+        String[] valores_recuperar = {"telefono", "nombre", "activo"};
         Cursor c = db.query("contactos", valores_recuperar, null, null, null, null, null, null);
 
-        c.moveToFirst();
-
         if(c.getCount() != 0){
+            c.moveToFirst();
+
             do {
-                Contact contactos = new Contact(c.getString(1), c.getString(0));
+                Contact contactos = new Contact(c.getString(1), c.getString(0), c.getInt(2));
                 lista_contactos.add(contactos);
             } while (c.moveToNext());
         }
