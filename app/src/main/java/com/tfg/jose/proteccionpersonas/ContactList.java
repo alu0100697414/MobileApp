@@ -116,7 +116,16 @@ public class ContactList extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
                 Contact cont = (Contact) list.getItemAtPosition(position);
 
-                String[] opc = new String[]{"Editar contacto","Eliminar contacto"};
+                String estado_contacto = "";
+                if(cont.getActivo() == 1){
+                    estado_contacto = "Deshabilitar contacto";
+                }
+                else if(cont.getActivo() == 0){
+                    estado_contacto = "Habilitar contacto";
+                }
+
+
+                String[] opc = new String[]{"Editar contacto",estado_contacto,"Eliminar contacto"};
                 AlertDialog opciones = new AlertDialog.Builder(ContactList.this)
                         .setItems(opc, new DialogInterface.OnClickListener() {
                             @Override
@@ -153,9 +162,23 @@ public class ContactList extends AppCompatActivity {
                                                         }
                                                     });
                                     alert.show();
-
                                 }
-                                if (selected == 1) { // Eliminar contacto
+
+                                if (selected == 1) { // Habilitar/deshabilitar contacto
+
+                                    Contact cont = (Contact) list.getItemAtPosition(position);
+
+                                    int estado = cont.getActivo();
+
+                                    if(estado == 1) { estado = 0; }
+                                    else if (estado == 0){ estado = 1; }
+
+                                    protectULLDB.modificarCONTACTO(cont.getNumber(),cont.getName(),estado);
+                                    mostrarContactos();
+                                }
+
+                                if (selected == 2) { // Eliminar contacto
+
                                     Contact con = (Contact) list.getItemAtPosition(position);
                                     protectULLDB.borrarCONTACTO(con.getNumber());
                                     mostrarContactos();
