@@ -56,7 +56,7 @@ public class ContactList extends AppCompatActivity {
 
         // Botón flotante
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setBackgroundTintList(getResources().getColorStateList(R.color.azulito));
+        fab.setBackgroundTintList(getResources().getColorStateList(R.color.float_button));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

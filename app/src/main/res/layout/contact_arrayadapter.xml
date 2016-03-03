@@ -7,22 +7,21 @@
         android:layout_height="wrap_content"
         android:id="@+id/contacto_nombre"
         android:textSize="@dimen/letra_lista"
+        android:textColor="@color/negro"
+        android:layout_marginLeft="15dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
         android:layout_centerVertical="true"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/contacto_numero"
-        android:textSize="@dimen/letra_lista"
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/estado_contacto"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
         android:layout_centerVertical="true"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/contacto_nombre"
-        android:layout_toEndOf="@+id/contacto_nombre"
-        android:layout_marginLeft="15dp"
-        android:layout_marginStart="15dp" />
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp" />
 
 </RelativeLayout>
