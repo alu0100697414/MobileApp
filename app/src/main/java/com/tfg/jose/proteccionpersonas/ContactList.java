@@ -115,14 +115,47 @@ public class ContactList extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
                 Contact cont = (Contact) list.getItemAtPosition(position);
-                Log.v("HELLO", cont.getNumber());
 
-                String[] opc = new String[]{"Eliminar contacto"};
+                String[] opc = new String[]{"Editar contacto","Eliminar contacto"};
                 AlertDialog opciones = new AlertDialog.Builder(ContactList.this)
                         .setItems(opc, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int selected) {
-                                if (selected == 0) { // Eliminar
+                                if (selected == 0) { // Modificar contacto
+
+                                    final Contact con = (Contact) list.getItemAtPosition(position);
+
+                                    LayoutInflater factory = LayoutInflater.from(ContactList.this);
+
+                                    final View textEntryView = factory.inflate(R.layout.add_contact_dialog, null);
+
+                                    final EditText input1 = (EditText) textEntryView.findViewById(R.id.contact_name);
+                                    input1.setText(con.getName());
+                                    final EditText input2 = (EditText) textEntryView.findViewById(R.id.contact_phone);
+                                    input2.setText(con.getNumber());
+
+                                    final AlertDialog.Builder alert = new AlertDialog.Builder(ContactList.this);
+                                    alert.setTitle("Editar contacto").setView(textEntryView)
+                                            .setPositiveButton("MODIFICAR",
+                                                    new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int whichButton) {
+
+                                                            protectULLDB.modificarCONTACTO(input2.getText().toString(), input1.getText().toString(), con.getActivo());
+                                                            mostrarContactos();
+                                                        }
+                                                    })
+                                            .setNegativeButton("CANCELAR",
+                                                    new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                             /*
+                                             * User clicked cancel so do some stuff
+                                             */
+                                                        }
+                                                    });
+                                    alert.show();
+
+                                }
+                                if (selected == 1) { // Eliminar contacto
                                     Contact con = (Contact) list.getItemAtPosition(position);
                                     protectULLDB.borrarCONTACTO(con.getNumber());
                                     mostrarContactos();
