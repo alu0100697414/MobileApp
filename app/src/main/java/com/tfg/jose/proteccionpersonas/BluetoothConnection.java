@@ -89,8 +89,12 @@ public class BluetoothConnection {
                         rssi_msg.setText("¡PELIGRO!\nSe ha superado la distancia límite. El agresor se encuentra a una distancia aproximada de:");
                         res_dist.setText(rdistance + "m");
 
-                        // Notificación del límite supe
+                        // Notificación del límite superado
                         notifi.notificar_limite();
+
+                        // Envío de aviso a los contactos
+                        notifi.enviar_sms();
+                        notifi.setSms_enviado(1);
 
                         // Abre la activity, si esta cerrada, con los resultados
                         if(mActivity.hasWindowFocus() == false) {
@@ -221,6 +225,8 @@ public class BluetoothConnection {
                     BTAdapter.cancelDiscovery();
 
                     mContext.stopService(new Intent(mContext, BService.class));
+
+                    notifi.setSms_enviado(0); // Acutlizamos a 0 para si vuelve a encotnrar al agresor
 
                     rssi_msg.setText("NO HAY PELIGRO.");
                     rssi_dist.setText("");

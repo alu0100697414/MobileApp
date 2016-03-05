@@ -235,10 +235,12 @@ public class ContactList extends AppCompatActivity {
         }
 
         if(protectULLDB.recuperarCONTACTOS().size() != 0){
+
             for (int i = 0; i < protectULLDB.recuperarCONTACTOS().size(); i++) {
                 adaptador.add(new Contact(protectULLDB.recuperarCONTACTOS().get(i).getName(), protectULLDB.recuperarCONTACTOS().get(i).getNumber(), protectULLDB.recuperarCONTACTOS().get(i).getActivo()));
-                adaptador.notifyDataSetChanged();
             }
+
+            adaptador.notifyDataSetChanged();
         }
     }
 
