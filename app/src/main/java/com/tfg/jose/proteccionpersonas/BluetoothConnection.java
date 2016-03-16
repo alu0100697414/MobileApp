@@ -1,6 +1,7 @@
 package com.tfg.jose.proteccionpersonas;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -29,7 +30,6 @@ public class BluetoothConnection {
     private Activity mActivity;
 
     private Notification notifi;
-    private RCamera rcamera;
 
     private boolean deviceFound; // True si encuentra el dispositivo
 
@@ -101,36 +101,11 @@ public class BluetoothConnection {
                             Intent intento = new Intent(mContext, Inicio.class);
                             intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                             mContext.startActivity(intento);
-
-                            final Timer pausar = new Timer(true);
-                            pausar.scheduleAtFixedRate(new TimerTask() {
-                                public void run() {
-                                    if(mActivity.hasWindowFocus() == true){
-                                        if(rcamera == null) {
-                                            rcamera = new RCamera(mContext,mActivity);
-                                        }
-
-                                        if(rcamera.getCameraState() == false){
-                                            try {
-                                                rcamera.startRecording();
-                                            }
-
-                                            catch (IOException e) {
-                                                String message = e.getMessage();
-                                                Log.i(null, "Problem Start" + message);
-                                                rcamera.getMrec().release();
-                                            }
-                                        }
-
-                                        pausar.cancel();
-                                    }
-                                }
-                            }, 0, 100);
-
                         }
 
-                        else {
-                            recordON();
+                        // Iniciamos el servicio con la grabación de vídeo
+                        if(isMyServiceRunning(BackgroundVideoRecorder.class) == false){
+                            mContext.startService(new Intent(mContext, BackgroundVideoRecorder.class));
                         }
 
                         TextView grabando = (TextView) mActivity.findViewById(R.id.grabando);
@@ -162,28 +137,6 @@ public class BluetoothConnection {
     double getDistance(double rssi, double txPower) {
         // El 4 es el valor de n y si no hay obstáculos de por medio se usa el valor 2
         return Math.pow(10d, ((double) txPower - rssi) / (10 * 4));
-    }
-
-    void recordON(){
-        if(mActivity.hasWindowFocus() == true){
-            if(rcamera == null) {
-                rcamera = new RCamera(mContext,mActivity);
-            }
-
-            if(rcamera.getCameraState() == false){
-                mActivity.invalidateOptionsMenu(); // Refrecamos el menú
-
-                try {
-                    rcamera.startRecording();
-                }
-
-                catch (IOException e) {
-                    String message = e.getMessage();
-                    Log.i(null, "Problem Start" + message);
-                    rcamera.getMrec().release();
-                }
-            }
-        }
     }
 
     // Si está desactivado el Bluetooth, enviamos mensaje para activarlo
@@ -230,9 +183,8 @@ public class BluetoothConnection {
 
                     rssi_msg.setText("NO HAY PELIGRO.");
                     rssi_dist.setText("");
-                }
 
-                else if(deviceFound == false && !BTAdapter.isEnabled()){
+                } else if (deviceFound == false && !BTAdapter.isEnabled()) {
                     BTAdapter.cancelDiscovery();
 
                     mContext.stopService(new Intent(mContext, BService.class));
@@ -241,13 +193,21 @@ public class BluetoothConnection {
                     rssi_dist.setText("");
 
                     notifi.bluetooth_desactivado();
-                }
-
-                else {
+                } else {
                     deviceFound = false;
                 }
             }
         }, DELAY);
+    }
+
+    boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Devuelve el nombre del dispositivo
@@ -278,15 +238,5 @@ public class BluetoothConnection {
     // Devuelve si encontró el dispositivo
     boolean getdeviceFound(){
         return deviceFound;
-    }
-
-    // Devuelve el objeto de la clase RCamera
-    RCamera getRcamera(){
-        return rcamera;
-    }
-
-    // Set para inicializar el objeto de la cámara
-    void setRcamera(RCamera rc){
-        rcamera = rc;
     }
 }

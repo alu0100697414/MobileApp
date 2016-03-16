@@ -97,7 +97,7 @@ public class Inicio extends AppCompatActivity {
 
         // Cambiamos el título del botón de la cámara dependiendo de su estado.
         MenuItem video = menu.findItem(R.id.video);
-        if(bluetooth.getRcamera() != null && bluetooth.getRcamera().getCameraState() == true) {
+        if(bluetooth.isMyServiceRunning(BackgroundVideoRecorder.class) == true) {
             video.setTitle("Parar grabación");
         } else {
             video.setTitle("Iniciar grabación");
@@ -118,8 +118,8 @@ public class Inicio extends AppCompatActivity {
 
 
         if(id == R.id.video){
-            if(bluetooth.getRcamera() != null && bluetooth.getRcamera().getCameraState() == true){
-                bluetooth.getRcamera().stopRecording(); // Para de grabar
+            if(bluetooth.isMyServiceRunning(BackgroundVideoRecorder.class) == true){
+                stopService(new Intent(this, BackgroundVideoRecorder.class));
                 invalidateOptionsMenu(); // Refrecamos el menú
 
                 TextView grabando = (TextView) findViewById(R.id.grabando);
@@ -127,7 +127,7 @@ public class Inicio extends AppCompatActivity {
                 grabando.setVisibility(View.INVISIBLE);
             }
             else {
-                bluetooth.recordON(); // Comienza a grabar
+                startService(new Intent(this, BackgroundVideoRecorder.class));
                 invalidateOptionsMenu(); // Refrecamos el menú
 
                 TextView grabando = (TextView) findViewById(R.id.grabando);
@@ -205,16 +205,6 @@ public class Inicio extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        // Paro la cámara si está activa.
-        if(bluetooth.getRcamera() != null){
-
-            if(bluetooth.getRcamera().getCameraState() == true) {
-                bluetooth.getRcamera().stopRecording();
-            }
-
-            bluetooth.getRcamera().stopCamera();
-        }
 
         bluetooth.estaBuscando(); // Vuelvo a comprobar que esté parada la busqueda de dispositivos
         unregisterReceiver(bluetooth.getReceiver());
