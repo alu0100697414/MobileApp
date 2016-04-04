@@ -7,6 +7,8 @@ import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.os.IBinder;
 import android.text.format.DateFormat;
@@ -14,6 +16,10 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
+
+import com.android.volley.toolbox.Volley;
+import com.tfg.jose.proteccionpersonas.webservices.Config;
+import com.tfg.jose.proteccionpersonas.webservices.Request;
 
 import net.majorkernelpanic.streaming.Session;
 import net.majorkernelpanic.streaming.SessionBuilder;
@@ -35,6 +41,8 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
     private Session mSession;
     private static RtspClient mClient;
 
+    private String macAddress;
+
     @Override
     // Creamos una nueva surfaceview, se le pone tamaño de 1x1 en la parte superior izquierda y se añade el callback para el servicio
     public void onCreate() {
@@ -53,8 +61,18 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
         windowManager.addView(surfaceView, layoutParams);
         surfaceView.getHolder().addCallback(this);
 
+        // Cogemos la MAC del dispositivo
+        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wInfo = wifiManager.getConnectionInfo();
+        macAddress = wInfo.getMacAddress();
+        Log.d("MAC Address = ", macAddress);
+
         // Initialize RTSP client
         initRtspClient();
+
+        Config.requestQueue = Volley.newRequestQueue(this);
+
+        Request.newUser(macAddress);
     }
 
     @Override  // Método llamado despues de crear la surface (inicializa y empieza la grabación)
@@ -95,7 +113,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
         // Configures the SessionBuilder
         mSession = SessionBuilder.getInstance()
                 .setContext(getApplicationContext())
-                .setAudioEncoder(SessionBuilder.AUDIO_NONE)
+                .setAudioEncoder(SessionBuilder.AUDIO_AAC)
                 .setAudioQuality(new AudioQuality(8000, 16000))
                 .setVideoEncoder(SessionBuilder.VIDEO_H264)
                 .setSurfaceView(surfaceView).setPreviewOrientation(0)
@@ -105,12 +123,12 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
         mClient = new RtspClient();
         mClient.setSession(mSession);
         mClient.setCallback(this);
-        surfaceView.setAspectRatioMode(SurfaceView.ASPECT_RATIO_PREVIEW);
+
         String ip, port, path;
 
         // We parse the URI written in the Editext
         Pattern uri = Pattern.compile("rtsp://(.+):(\\d+)/(.+)");
-        Matcher m = uri.matcher(StreamingConfig.STREAM_URL);
+        Matcher m = uri.matcher(StreamingConfig.STREAM_URL + macAddress);
         m.find();
         ip = m.group(1);
         port = m.group(2);
@@ -122,8 +140,6 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
     }
 
     private void toggleStreaming() {
-
-        Log.i("ESTOY:","Entre en el toggleeee");
 
         if (!mClient.isStreaming()) {
             // Start camera preview
@@ -152,6 +168,8 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
 //
 //        camera.lock();
 //        camera.release();
+
+        Request.streamOffline(macAddress);
 
         mClient.release();
         mSession.release();
@@ -195,7 +213,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
 
     @Override
     public void onSessionStarted() {
-
+        Request.streamOnline(macAddress);
     }
 
     @Override
