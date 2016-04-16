@@ -1,26 +1,20 @@
 package com.tfg.jose.proteccionpersonas.webservices;
 
-import android.content.Context;
+import android.text.format.Time;
 import android.util.Log;
 
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.tfg.jose.proteccionpersonas.StreamingConfig;
-//import com.cryptull.atlas.streaming.Stream;
-//import com.cryptull.atlas.streaming.StreamAdapter;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
- * Created by Ivan on 27/10/2015.
+ * Created by Jose Angel.
  */
+
 public class Request {
 
     //Función que registra a un usuario en el servicio web la primera vez que usa la app
@@ -49,9 +43,27 @@ public class Request {
 
 
     //Función que establece un video como online
-    public static void streamOnline(String MAC) {
+    public static void streamOnline(String MAC, String name, String tlf) {
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, Config.SERVER_URL + "/online/" + MAC,
+        Time now = new Time(Time.getCurrentTimezone());
+        now.setToNow();
+
+        String minute;
+        String hour;
+
+        int min = now.minute; if(min < 10){minute = "0" + String.valueOf(min);} else { minute = String.valueOf(min); }
+        int hou = now.hour; if(hou < 10){hour = "0" + String.valueOf(hou);} else { hour = String.valueOf(hou); }
+
+        String fecha = now.monthDay + "/" + (now.month+1) + "/" + now.year + " - " + hour + ":" + minute;
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("name", MAC);
+        params.put("server", StreamingConfig.STREAM_SHORT_URL);
+        params.put("nombre", name);
+        params.put("numero", tlf);
+        params.put("time_now", fecha);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, Config.SERVER_URL + "/online/" + MAC, new JSONObject(params),
                 new com.android.volley.Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -72,7 +84,21 @@ public class Request {
     //Función que establece un video como offline
     public static void streamOffline(String MAC) {
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, Config.SERVER_URL + "/offline/" + MAC,
+        Time now = new Time(Time.getCurrentTimezone());
+        now.setToNow();
+
+        String minute;
+        String hour;
+
+        int min = now.minute; if(min < 10){minute = "0" + String.valueOf(min);} else { minute = String.valueOf(min); }
+        int hou = now.hour; if(hou < 10){hour = "0" + String.valueOf(hou);} else { hour = String.valueOf(hou); }
+
+        String fecha = now.monthDay + "/" + (now.month+1) + "/" + now.year + " - " + hour + ":" + minute;
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("date_last_online", fecha);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, Config.SERVER_URL + "/offline/" + MAC, new JSONObject(params),
                 new com.android.volley.Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {

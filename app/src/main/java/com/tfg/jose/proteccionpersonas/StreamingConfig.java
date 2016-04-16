@@ -5,9 +5,9 @@ package com.tfg.jose.proteccionpersonas;
  */
 public class StreamingConfig {
 
-    public static final String STREAM_URL = "rtsp://10.154.0.38:1935/live/protectull/";
+    public static final String STREAM_URL = "rtsp://10.154.2.19:1935/live/protectull/";
     public static final String PUBLISHER_USERNAME = "protectull";
     public static final String PUBLISHER_PASSWORD = "4nWUbnEy";
-    public static final String STREAM_SHORT_URL = "10.154.0.38:1935/live/protectull/";
+    public static final String STREAM_SHORT_URL = "10.154.2.19:1935/live/protectull/";
 
 }

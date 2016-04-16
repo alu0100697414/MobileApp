@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">ProtectULL</string>
+    <string name="app_name"> </string>
+    <string name="inicio_name">ProtectULL</string>
     <string name="action_settings">Configuración</string>
     <string name="app_title">Protección de Personas</string>
     <string name="bluetooth">Activar Bluetooth</string>

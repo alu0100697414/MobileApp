@@ -7,6 +7,8 @@ import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
+import android.widget.EditText;
 
 import com.android.volley.toolbox.Volley;
 import com.tfg.jose.proteccionpersonas.webservices.Config;
@@ -27,7 +30,9 @@ import net.majorkernelpanic.streaming.audio.AudioQuality;
 import net.majorkernelpanic.streaming.gl.SurfaceView;
 import net.majorkernelpanic.streaming.rtsp.RtspClient;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +45,13 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
 
     private Session mSession;
     private static RtspClient mClient;
+
+    private DBase protectULLDB;
+
+    private NetworkInfo mWifi;
+
+    private String nombre_usuario;
+    private String numero_usuario;
 
     private String macAddress;
 
@@ -55,6 +67,21 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
                 PixelFormat.TRANSLUCENT
         );
 
+        // Inicializamos la base de datos
+        protectULLDB = new DBase(getApplicationContext());
+
+        List<Contact> contacto;
+        contacto = protectULLDB.recuperarINFO_USUARIO();
+
+        if(!contacto.isEmpty()){
+            nombre_usuario = contacto.get(0).getName();
+            numero_usuario = contacto.get(0).getNumber();
+        }
+        else {
+            nombre_usuario = "Sin definir";
+            numero_usuario = "Sin definir";
+        }
+
         surfaceView = new SurfaceView(this);
 
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
@@ -67,46 +94,56 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
         macAddress = wInfo.getMacAddress();
         Log.d("MAC Address = ", macAddress);
 
-        // Initialize RTSP client
-        initRtspClient();
+        // Comprobamos si está conectado el móvil a una wifi
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-        Config.requestQueue = Volley.newRequestQueue(this);
-
-        Request.newUser(macAddress);
+        // Si está conectado, enviamos el vídeo en streaming.
+        if (mWifi.isConnected()) {
+            // Initialize RTSP client
+            initRtspClient();
+            Config.requestQueue = Volley.newRequestQueue(this);
+            Request.newUser(macAddress);
+        }
     }
 
     @Override  // Método llamado despues de crear la surface (inicializa y empieza la grabación)
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
-//        camera = Camera.open();
-//
-//        Camera.Parameters params = camera.getParameters();
-//        params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-//        camera.setParameters(params);
-//
-//        mediaRecorder = new MediaRecorder();
-//
-//        camera.unlock();
-//
-//        mediaRecorder.setPreviewDisplay(surfaceHolder.getSurface());
-//        mediaRecorder.setCamera(camera);
-//        mediaRecorder.setOrientationHint(90);
-//        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-//        mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-//        mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
-//
-//        mediaRecorder.setOutputFile(
-//                Environment.getExternalStorageDirectory()+"/"+
-//                        DateFormat.format("yyyy-MM-dd_kk-mm-ss", new Date().getTime())+
-//                        ".mp4"
-//        );
-//
-//        try { mediaRecorder.prepare(); }
-//        catch (Exception e) {}
-//
-//        mediaRecorder.start();
+        // Si el wifi está desconectado, guardamos el vídeo.
+        if (!mWifi.isConnected()) {
 
-        toggleStreaming();
+            camera = Camera.open();
+
+            Camera.Parameters params = camera.getParameters();
+            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            camera.setParameters(params);
+
+            mediaRecorder = new MediaRecorder();
+
+            camera.unlock();
+
+            mediaRecorder.setPreviewDisplay(surfaceHolder.getSurface());
+            mediaRecorder.setCamera(camera);
+            mediaRecorder.setOrientationHint(90);
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+            mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+
+            mediaRecorder.setOutputFile(
+                    Environment.getExternalStorageDirectory()+"/"+
+                            DateFormat.format("yyyy-MM-dd_kk-mm-ss", new Date().getTime())+
+                            ".mp4"
+            );
+
+            try { mediaRecorder.prepare(); }
+            catch (Exception e) {}
+
+            mediaRecorder.start();
+        }
+        else { // Sino, iniciamos el vídeo en streaming
+            toggleStreaming();
+        }
     }
 
     private void initRtspClient() {
@@ -116,7 +153,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
                 .setAudioEncoder(SessionBuilder.AUDIO_AAC)
                 .setAudioQuality(new AudioQuality(8000, 16000))
                 .setVideoEncoder(SessionBuilder.VIDEO_H264)
-                .setSurfaceView(surfaceView).setPreviewOrientation(0)
+                .setSurfaceView(surfaceView)
                 .setCallback(this).build();
 
         // Configures the RTSP client
@@ -160,19 +197,25 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
     @Override  // Para de grabar y elimina la surface (Destructor)
     public void onDestroy() {
 
-        toggleStreaming();
+        // Si se está enviando un vídeo en streaming, lo paramos
+        if (mWifi.isConnected()) {
+            toggleStreaming();
 
-//        mediaRecorder.stop();
-//        mediaRecorder.reset();
-//        mediaRecorder.release();
-//
-//        camera.lock();
-//        camera.release();
+            Request.streamOffline(macAddress);
 
-        Request.streamOffline(macAddress);
+            mClient.release();
+            mSession.release();
+        }
 
-        mClient.release();
-        mSession.release();
+        // En caso de que se esté guardando en el dispositivo, se termina de grabar
+        else {
+            mediaRecorder.stop();
+            mediaRecorder.reset();
+            mediaRecorder.release();
+
+            camera.lock();
+            camera.release();
+        }
 
         windowManager.removeView(surfaceView);
     }
@@ -213,7 +256,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
 
     @Override
     public void onSessionStarted() {
-        Request.streamOnline(macAddress);
+        Request.streamOnline(macAddress,nombre_usuario,numero_usuario);
     }
 
     @Override

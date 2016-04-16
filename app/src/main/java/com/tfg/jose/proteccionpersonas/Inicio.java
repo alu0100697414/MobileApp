@@ -8,12 +8,16 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +29,8 @@ public class Inicio extends AppCompatActivity {
     private Notification notifi;
 
     ScheduledExecutorService executor;
+
+    private DBase protectULLDB;
 
     // Constructor
     public Inicio(){
@@ -43,6 +49,9 @@ public class Inicio extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Inicializamos la base de datos
+        protectULLDB = new DBase(getApplicationContext());
 
         // Filtro para cuando encuentre dispositivos bluetooth
         IntentFilter bluetoothFilter = new IntentFilter();
@@ -139,6 +148,54 @@ public class Inicio extends AppCompatActivity {
         // Activa el bluetooth
         if(id == R.id.bluetooth){
             bluetooth.estaActivado();
+        }
+
+        // Sale pestaá para actualizar la info del usuario
+        if(id == R.id.action_info_usuario){
+
+            LayoutInflater factory = LayoutInflater.from(Inicio.this);
+
+            final View textEntryView = factory.inflate(R.layout.add_contact_dialog, null);
+
+            List<Contact> contacto = new ArrayList<Contact>();
+            contacto = protectULLDB.recuperarINFO_USUARIO();
+
+            final List<Contact> contactoF = contacto;
+
+            final EditText input1 = (EditText) textEntryView.findViewById(R.id.contact_name);
+            final EditText input2 = (EditText) textEntryView.findViewById(R.id.contact_phone);
+
+            if(!contacto.isEmpty()){
+
+                Contact con = new Contact(contacto.get(0).getName(),contacto.get(0).getNumber(),1);
+
+                input1.setText(con.getName());
+                input2.setText(con.getNumber());
+            }
+
+            final AlertDialog.Builder alert = new AlertDialog.Builder(Inicio.this);
+                    alert.setTitle("Actualice su información personal")
+                         .setMessage("Mantenga su información de contacto actualizada por seguridad.")
+                         .setView(textEntryView)
+                         .setPositiveButton("ACTUALIZAR",
+                                 new DialogInterface.OnClickListener() {
+                                     public void onClick(DialogInterface dialog, int whichButton) {
+                                         if (!contactoF.isEmpty()) {
+                                             protectULLDB.modificarINFO_USUARIO(input2.getText().toString(), input1.getText().toString());
+                                         } else {
+                                             protectULLDB.insertarINFO_USUARIO(input2.getText().toString(), input1.getText().toString());
+                                         }
+                                     }
+                                 })
+                            .setNegativeButton("CANCELAR",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                             /*
+                                             * User clicked cancel so do some stuff
+                                             */
+                            }
+                         });
+            alert.show();
         }
 
         // Botón para cerrar la app.
