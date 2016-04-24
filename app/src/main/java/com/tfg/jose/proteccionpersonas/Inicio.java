@@ -2,10 +2,12 @@ package com.tfg.jose.proteccionpersonas;
 
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -185,6 +187,8 @@ public class Inicio extends AppCompatActivity {
                                          } else {
                                              protectULLDB.insertarINFO_USUARIO(input2.getText().toString(), input1.getText().toString());
                                          }
+
+                                         Snackbar.make(getWindow().getDecorView().getRootView(), "Datos actualizados.", Snackbar.LENGTH_LONG).show();
                                      }
                                  })
                             .setNegativeButton("CANCELAR",
@@ -195,6 +199,46 @@ public class Inicio extends AppCompatActivity {
                                              */
                             }
                          });
+            alert.show();
+        }
+
+        // Sale pestaá para actualizar la info del usuario
+        if(id == R.id.action_password){
+
+            LayoutInflater factory = LayoutInflater.from(Inicio.this);
+
+            final View textEntryView = factory.inflate(R.layout.password_menu, null);
+
+            final EditText password = (EditText) textEntryView.findViewById(R.id.password_user);
+            final EditText confirm_password = (EditText) textEntryView.findViewById(R.id.password_user_confirm);
+
+            final Context context = this;
+
+            final View vista = this.findViewById(android.R.id.content);
+
+            final AlertDialog.Builder alert = new AlertDialog.Builder(Inicio.this);
+            alert.setTitle("Actualizar contraseña")
+                    .setMessage("Tenga actualizada la contraseña para evitar que puedan entrar en la aplicación.")
+                    .setView(textEntryView)
+                    .setPositiveButton("ACTUALIZAR",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    if (password.getText().toString().equals(confirm_password.getText().toString())) {
+                                        protectULLDB.modificarCONFIG_APP("1", password.getText().toString());
+                                        Snackbar.make(vista, "Contraseña actualizada.", Snackbar.LENGTH_LONG).show();
+                                    } else {
+                                        Snackbar.make(vista, "Las contraseñas no coinciden.", Snackbar.LENGTH_LONG).show();
+                                    }
+                                }
+                            })
+                    .setNegativeButton("CANCELAR",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                             /*
+                                             * User clicked cancel so do some stuff
+                                             */
+                                }
+                            });
             alert.show();
         }
 

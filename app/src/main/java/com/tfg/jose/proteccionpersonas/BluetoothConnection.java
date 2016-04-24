@@ -135,8 +135,8 @@ public class BluetoothConnection {
 
     // Devuelve la distancia aproximada en metros entre dos dispositivos
     double getDistance(double rssi, double txPower) {
-        // El 4 es el valor de n y si no hay obstáculos de por medio se usa el valor 2
-        return Math.pow(10d, ((double) txPower - rssi) / (10 * 4));
+        // El 2.7 es el valor de n y si no hay obstáculos de por medio se usa el valor 2
+        return Math.pow(10d, ((double) txPower - rssi) / (10 * 2.7));
     }
 
     // Si está desactivado el Bluetooth, enviamos mensaje para activarlo

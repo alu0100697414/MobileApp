@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name"> </string>
     <string name="inicio_name">ProtectULL</string>
+    <string name="inicio_sesion">Acceso a la configuración del dispositivo:</string>
     <string name="action_settings">Configuración</string>
+    <string name="password">Contraseña</string>
+    <string name="password_confirm">Confirmar contraseña</string>
     <string name="app_title">Protección de Personas</string>
     <string name="bluetooth">Activar Bluetooth</string>
     <string name="buscando">Buscando...</string>
@@ -19,5 +22,6 @@
     <string name="existente">Existente</string>
     <string name="numero_contacto">Número</string>
     <string name="nombre_contacto">Nombre</string>
+    <string name="title_activity_autentication">Autentication</string>
 
 </resources>

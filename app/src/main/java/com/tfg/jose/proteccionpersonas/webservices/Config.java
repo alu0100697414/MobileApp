@@ -7,8 +7,8 @@ import com.android.volley.RequestQueue;
  */
 public class Config {
 
-    public static final String IP = "10.154.2.19";
+    public static final String IP = "10.163.1.56";
     public static final String PORT = "3000";
-    public static final String SERVER_URL = "http://10.154.2.19:3000";
+    public static final String SERVER_URL = "http://10.163.1.56:3000";
     public static RequestQueue requestQueue;
 }

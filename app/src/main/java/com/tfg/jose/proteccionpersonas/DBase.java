@@ -20,7 +20,8 @@ public class DBase extends SQLiteOpenHelper {
     private static final String NOMBRE_BASEDATOS = "protectULL.db";
     private static final String TABLA_CONTACTOS = "CREATE TABLE contactos (telefono TEXT PRIMARY KEY, nombre TEXT, activo INTEGER)";
     private static final String TABLA_INFO_USUARIO = "CREATE TABLE tabla_info_usuario (telefono TEXT PRIMARY KEY, nombre TEXT)";
-    private static final int VERSION_BASEDATOS = 4;
+    private static final String TABLA_CONFIG_APP = "CREATE TABLE tabla_config_app (id TEXT PRIMARY KEY, password TEXT)";
+    private static final int VERSION_BASEDATOS = 5;
 
     // Constructor de la clase
     public DBase(Context context) {
@@ -33,12 +34,14 @@ public class DBase extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(TABLA_CONTACTOS);
         db.execSQL(TABLA_INFO_USUARIO);
+        db.execSQL(TABLA_CONFIG_APP);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLA_CONTACTOS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLA_INFO_USUARIO);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLA_CONFIG_APP);
         onCreate(db);
     }
 
@@ -186,4 +189,49 @@ public class DBase extends SQLiteOpenHelper {
 
         return lista_contactos;
     }
+
+    // METODOS DE LA TABLA CONFIG APP
+    // Inserta la contraseña de la app
+    public void insertarCONFIG_APP(String id, String pass) {
+        SQLiteDatabase db = getWritableDatabase();
+        if(db != null){
+            ContentValues valores = new ContentValues();
+            valores.put("id", id);
+            valores.put("password", pass);
+            db.insert("tabla_config_app", null, valores);
+            db.close();
+        }
+    }
+
+    // Edita la contraseña de la app
+    public void modificarCONFIG_APP(String id, String pass){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues valores = new ContentValues();
+        valores.put("id", id);
+        valores.put("password", pass);
+        db.update("tabla_config_app", valores, id, null);
+        db.close();
+    }
+
+    // Devuelve la contraseña
+    public String recuperarCONFIG_APP(String id) {
+
+        SQLiteDatabase db = getReadableDatabase();
+        String[] valores_recuperar = {"password"};
+        Cursor c = db.query("tabla_config_app", valores_recuperar, id, null, null, null, null, null);
+
+        String pass = "";
+        if(c != null) {
+            c.moveToFirst();
+            if(c.getCount() > 0){
+                pass = c.getString(0);
+            }
+        }
+
+        db.close();
+        c.close();
+
+        return pass;
+    }
 }
+
