@@ -52,6 +52,8 @@ public class Inicio extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        toolbar.setLogo(R.mipmap.ic_launcher);
+
         // Inicializamos la base de datos
         protectULLDB = new DBase(getApplicationContext());
 
@@ -109,9 +111,9 @@ public class Inicio extends AppCompatActivity {
         // Cambiamos el título del botón de la cámara dependiendo de su estado.
         MenuItem video = menu.findItem(R.id.video);
         if(bluetooth.isMyServiceRunning(BackgroundVideoRecorder.class) == true) {
-            video.setTitle("Parar grabación");
+            video.setTitle(R.string.parar_grabacion);
         } else {
-            video.setTitle("Iniciar grabación");
+            video.setTitle(R.string.iniciar_grabacion);
         }
 
         return true;
@@ -176,10 +178,10 @@ public class Inicio extends AppCompatActivity {
             }
 
             final AlertDialog.Builder alert = new AlertDialog.Builder(Inicio.this);
-                    alert.setTitle("Actualice su información personal")
-                         .setMessage("Mantenga su información de contacto actualizada por seguridad.")
+                    alert.setTitle(getString(R.string.update_title))
+                         .setMessage(getString(R.string.update_text))
                          .setView(textEntryView)
-                         .setPositiveButton("ACTUALIZAR",
+                         .setPositiveButton(getString(R.string.actualizar),
                                  new DialogInterface.OnClickListener() {
                                      public void onClick(DialogInterface dialog, int whichButton) {
                                          if (!contactoF.isEmpty()) {
@@ -188,10 +190,10 @@ public class Inicio extends AppCompatActivity {
                                              protectULLDB.insertarINFO_USUARIO(input2.getText().toString(), input1.getText().toString());
                                          }
 
-                                         Snackbar.make(getWindow().getDecorView().getRootView(), "Datos actualizados.", Snackbar.LENGTH_LONG).show();
+                                         Snackbar.make(getWindow().getDecorView().getRootView(), getString(R.string.datos_actualizados), Snackbar.LENGTH_LONG).show();
                                      }
                                  })
-                            .setNegativeButton("CANCELAR",
+                            .setNegativeButton(getString(R.string.cancelar),
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
                                              /*
@@ -217,21 +219,21 @@ public class Inicio extends AppCompatActivity {
             final View vista = this.findViewById(android.R.id.content);
 
             final AlertDialog.Builder alert = new AlertDialog.Builder(Inicio.this);
-            alert.setTitle("Actualizar contraseña")
-                    .setMessage("Tenga actualizada la contraseña para evitar que puedan entrar en la aplicación.")
+            alert.setTitle(getString(R.string.update_pass_title))
+                    .setMessage(getString(R.string.update_pass_text))
                     .setView(textEntryView)
-                    .setPositiveButton("ACTUALIZAR",
+                    .setPositiveButton(getString(R.string.actualizar),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     if (password.getText().toString().equals(confirm_password.getText().toString())) {
                                         protectULLDB.modificarCONFIG_APP("1", password.getText().toString());
-                                        Snackbar.make(vista, "Contraseña actualizada.", Snackbar.LENGTH_LONG).show();
+                                        Snackbar.make(vista, getString(R.string.updated_pass), Snackbar.LENGTH_LONG).show();
                                     } else {
-                                        Snackbar.make(vista, "Las contraseñas no coinciden.", Snackbar.LENGTH_LONG).show();
+                                        Snackbar.make(vista, getString(R.string.updated_pass_error), Snackbar.LENGTH_LONG).show();
                                     }
                                 }
                             })
-                    .setNegativeButton("CANCELAR",
+                    .setNegativeButton(getString(R.string.cancelar),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                              /*
@@ -246,8 +248,8 @@ public class Inicio extends AppCompatActivity {
         if(id == R.id.action_exit){
             // Muestro alerta para confirmación.
             new AlertDialog.Builder(this)
-                    .setTitle("¡AVISO!")
-                    .setMessage("Si cierra la app, quedará desprotegid@.")
+                    .setTitle(getString(R.string.aviso))
+                    .setMessage(getString(R.string.cerrar_app_text))
                     .setNegativeButton(android.R.string.no, null)
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
@@ -275,13 +277,13 @@ public class Inicio extends AppCompatActivity {
 
             invalidateOptionsMenu(); // Refrescamos el menú
 
-            Toast.makeText(Inicio.this, "Ha activado el Bluetooth.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Inicio.this, R.string.b_activado, Toast.LENGTH_SHORT).show();
         }
 
         // Si no lo activó
         else if (resultCode == 0){
             TextView rssi_msg = (TextView) this.findViewById(R.id.res_busqueda);
-            rssi_msg.setText("Bluetooth desactivado.");
+            rssi_msg.setText(R.string.b_desactivado);
 
             TextView rssi_dist = (TextView) this.findViewById(R.id.res_distancia);
             rssi_dist.setText("");

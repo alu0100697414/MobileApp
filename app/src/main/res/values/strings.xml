@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name"> </string>
-    <string name="inicio_name">ProtectULL</string>
+
+    <string name="app_name" translatable="false"> </string>
+    <string name="inicio_name" translatable="false">ProtectULL</string>
     <string name="inicio_sesion">Acceso a la configuración del dispositivo:</string>
     <string name="action_settings">Configuración</string>
     <string name="password">Contraseña</string>
@@ -15,7 +16,7 @@
     <string name="Titulo">Datos del dispositivo del agresor</string>
     <string name="Titulo_Encontrado">Estado</string>
 
-    <string name="title_activity_contact_">Contact_Activity</string>
+    <string name="title_activity_contact_" translatable="false">Contact_Activity</string>
     <string name="title_activity_contact_list">Contactos</string>
     <string name="listado_title">Listado a avisar:</string>
     <string name="nuevo">Nuevo</string>
@@ -23,5 +24,52 @@
     <string name="numero_contacto">Número</string>
     <string name="nombre_contacto">Nombre</string>
     <string name="title_activity_autentication">Autentication</string>
+    <string name="pass_incorrecta">Contraseña incorrecta.</string>
+    <string name="no_definido">Sin definir</string>
+
+    <string name="peligro">¡PELIGRO!</string>
+    <string name="mensaje_peligro">Se ha superado la distancia límite. El agresor se encuentra a una distancia aproximada de:</string>
+    <string name="mensaje_aviso">Fuera de la distancia de peligro.</string>
+    <string name="sin_peligro">NO HAY PELIGRO.</string>
+    <string name="b_desactivado">Bluetooth desactivado.</string>
+
+    <string name="add_contacto">Añadir contacto</string>
+    <string name="add_contacto_msg">Añada un contacto a su lista de avisos.</string>
+    <string name="nuevo_contacto">Nuevo contacto</string>
+    <string name="add">AÑADIR</string>
+    <string name="cancelar">CANCELAR</string>
+    <string name="deshab_contacto">Deshabilitar contacto</string>
+    <string name="hab_contacto">Habilitar contacto</string>
+    <string name="editar_contacto">Editar contacto</string>
+    <string name="eliminar_contacto">Eliminar contacto</string>
+    <string name="modificar">MODIFICAR</string>
+    <string name="iniciar_grabacion">Iniciar grabación</string>
+    <string name="parar_grabacion">Parar grabación</string>
+    <string name="actualizar">ACTUALIZAR</string>
+
+    <string name="update_title">Actualice su información personal</string>
+    <string name="update_text">Mantenga su información de contacto actualizada por seguridad.</string>
+    <string name="datos_actualizados">Datos actualizados.</string>
+    <string name="update_pass_title">Actualizar contraseña</string>
+    <string name="update_pass_text">Tenga actualizada la contraseña para evitar que puedan entrar en la aplicación.</string>
+    <string name="updated_pass">Contraseña actualizada.</string>
+    <string name="updated_pass_error">Las contraseñas no coinciden.</string>
+    <string name="aviso">¡AVISO!</string>
+    <string name="cerrar_app_text">Si cierra la app, quedará desprotegid@.</string>
+    <string name="b_activado">Ha activado el Bluetooth.</string>
+
+    <string name="msg_b_desactivado_1">Por favor, acceda a la aplicación pulsando sobre esta notificación, ya que el bluetooth está desactivado</string>
+    <string name="msg_b_desactivado_2">y corre peligro de que el agresor esté cerca.</string>
+    <string name="msg_agresor_detectado">El agresor ha sido detectado.</string>
+    <string name="text_agresor_detectado">El agresor ha sido detectado pero no ha superado la distancia límite.</string>
+    <string name="dis_limite_superada">Distancia límite superada.</string>
+    <string name="text_agresor_peligro">El agresor ha sido detectado y además, superó la distancia límite.</string>
+    <string name="grabando_puntos">Grabando...</string>
+    <string name="grabacion_encurso">Grabación en curso.</string>
+    <string name="user_info">Info usuarip</string>
+
+    <string name="a_las">A las</string>
+    <string name="del_dia">del día</string>
+    <string name="msg_sms">el agresor/a ha superado la distancia límite. Póngase en contacto con la víctima, y si no contesta, llame al 016 (teléfono gratuito).</string>
 
 </resources>

@@ -47,11 +47,10 @@ public class Notification {
         builder.setSmallIcon(R.drawable.notification);
         builder.setAutoCancel(true);
         builder.setOngoing(true);
-        builder.setContentTitle("¡AVISO!");
-        builder.setContentText("Bluetooth desactivado.");
+        builder.setContentTitle(mContext.getString(R.string.aviso));
+        builder.setContentText(mContext.getString(R.string.b_desactivado));
 
-        String texto = "Por favor, acceda a la aplicación pulsando sobre esta notificación, ya que el bluetooth está desactivado " +
-                "y corre peligro de que el agresor esté cerca.";
+        String texto = mContext.getString(R.string.msg_b_desactivado_1) + " " + mContext.getString(R.string.msg_b_desactivado_2);
         builder.setStyle(new NotificationCompat.BigTextStyle().bigText(texto));
 
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -73,10 +72,10 @@ public class Notification {
         builder.setSmallIcon(R.drawable.notification);
         builder.setVibrate(new long[]{1000, 1000});
         builder.setAutoCancel(true);
-        builder.setContentTitle("¡AVISO!");
-        builder.setContentText("El agresor ha sido detectado.");
+        builder.setContentTitle(mContext.getString(R.string.aviso));
+        builder.setContentText(mContext.getString(R.string.msg_agresor_detectado));
 
-        String texto = "El agresor ha sido detectado pero no ha superado la distancia límite.";
+        String texto = mContext.getString(R.string.text_agresor_detectado);
         builder.setStyle(new NotificationCompat.BigTextStyle().bigText(texto));
 
         NotificationManager notificationManager = (NotificationManager) mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -95,10 +94,10 @@ public class Notification {
         builder.setSmallIcon(R.drawable.notification);
         builder.setVibrate(new long[]{1000, 1000});
         builder.setAutoCancel(true);
-        builder.setContentTitle("¡PELIGRO!");
-        builder.setContentText("Distancia límite superada.");
+        builder.setContentTitle(mContext.getString(R.string.peligro));
+        builder.setContentText(mContext.getString(R.string.dis_limite_superada));
 
-        String texto = "El agresor ha sido detectado y además, superó la distancia límite.";
+        String texto = mContext.getString(R.string.text_agresor_peligro);
         builder.setStyle(new NotificationCompat.BigTextStyle().bigText(texto));
 
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -119,8 +118,8 @@ public class Notification {
         builder.setContentIntent(pendingIntent);
         builder.setSmallIcon(R.drawable.grabando);
         builder.setAutoCancel(true);
-        builder.setContentTitle("Grabando...");
-        builder.setContentText("Grabación en curso.");
+        builder.setContentTitle(mContext.getString(R.string.grabando_puntos));
+        builder.setContentText(mContext.getString(R.string.grabacion_encurso));
 
         NotificationManager notificationManager = (NotificationManager) mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(1, builder.build());
@@ -141,7 +140,7 @@ public class Notification {
         int hou = now.hour; if(hou < 10){hour = "0" + String.valueOf(hou);} else { hour = String.valueOf(hou); }
 
 
-        String mensaje = "¡AVISO! A las " + hour + ":" + minute + " del día " + now.monthDay + "/" + now.month + "/" + now.year + " el agresor/a ha superado la distancia límite. Póngase en contacto con la víctima, y si no contesta, llame al 016 (teléfono gratuito).";
+        String mensaje = mContext.getString(R.string.aviso) + " " + mContext.getString(R.string.a_las) +  " " + hour + ":" + minute + " " + mContext.getString(R.string.del_dia) + " " + now.monthDay + "/" + now.month + "/" + now.year + " " + mContext.getString(R.string.msg_sms);
 
         SmsManager sms = SmsManager.getDefault();
 

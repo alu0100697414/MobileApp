@@ -86,7 +86,7 @@ public class BluetoothConnection {
 
                     // Si está dentro de la distancia límite se le avisa
                     if(distance < getDistancia_limite()){
-                        rssi_msg.setText("¡PELIGRO!\nSe ha superado la distancia límite. El agresor se encuentra a una distancia aproximada de:");
+                        rssi_msg.setText(context.getString(R.string.peligro) + "\n" + context.getString(R.string.mensaje_peligro));
                         res_dist.setText(rdistance + "m");
 
                         // Notificación del límite superado
@@ -115,7 +115,7 @@ public class BluetoothConnection {
 
                     // Si lo encuentra pero no la supera, se le dice
                     else {
-                        rssi_msg.setText("Fuera de la distancia de peligro.");
+                        rssi_msg.setText(context.getString(R.string.mensaje_aviso));
                         res_dist.setText(rdistance + "m");
 
                         // Notificación de que se encuentra por los alrededores
@@ -181,7 +181,7 @@ public class BluetoothConnection {
 
                     notifi.setSms_enviado(0); // Acutlizamos a 0 para si vuelve a encotnrar al agresor
 
-                    rssi_msg.setText("NO HAY PELIGRO.");
+                    rssi_msg.setText(mContext.getString(R.string.sin_peligro));
                     rssi_dist.setText("");
 
                 } else if (deviceFound == false && !BTAdapter.isEnabled()) {
@@ -189,7 +189,7 @@ public class BluetoothConnection {
 
                     mContext.stopService(new Intent(mContext, BService.class));
 
-                    rssi_msg.setText("Bluetooth desactivado.");
+                    rssi_msg.setText(mContext.getString(R.string.b_desactivado));
                     rssi_dist.setText("");
 
                     notifi.bluetooth_desactivado();

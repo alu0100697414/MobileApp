@@ -64,8 +64,8 @@ public class ContactList extends AppCompatActivity {
             public void onClick(View view) {
 
                 new AlertDialog.Builder(ContactList.this)
-                        .setTitle("Añadir contacto")
-                        .setMessage("Añada un contacto a su lista de avisos.")
+                        .setTitle(R.string.add_contacto)
+                        .setMessage(R.string.add_contacto_msg)
                                 // Creamos nuevo dialogo para crear un nuevo contacto
                         .setNegativeButton(R.string.nuevo, new DialogInterface.OnClickListener() {
 
@@ -78,8 +78,8 @@ public class ContactList extends AppCompatActivity {
                                 final EditText input2 = (EditText) textEntryView.findViewById(R.id.contact_phone);
 
                                 final AlertDialog.Builder alert = new AlertDialog.Builder(ContactList.this);
-                                alert.setTitle("Nuevo contacto").setView(textEntryView)
-                                        .setPositiveButton("AÑADIR",
+                                alert.setTitle(R.string.nuevo_contacto).setView(textEntryView)
+                                        .setPositiveButton(R.string.add,
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -87,7 +87,7 @@ public class ContactList extends AppCompatActivity {
                                                         mostrarContactos();
                                                     }
                                                 })
-                                        .setNegativeButton("CANCELAR",
+                                        .setNegativeButton(R.string.cancelar,
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int whichButton) {
                                              /*
@@ -120,14 +120,14 @@ public class ContactList extends AppCompatActivity {
 
                 String estado_contacto = "";
                 if(cont.getActivo() == 1){
-                    estado_contacto = "Deshabilitar contacto";
+                    estado_contacto = getString(R.string.deshab_contacto);
                 }
                 else if(cont.getActivo() == 0){
-                    estado_contacto = "Habilitar contacto";
+                    estado_contacto = getString(R.string.hab_contacto);
                 }
 
 
-                String[] opc = new String[]{"Editar contacto",estado_contacto,"Eliminar contacto"};
+                String[] opc = new String[]{getString(R.string.editar_contacto),estado_contacto,getString(R.string.eliminar_contacto)};
                 AlertDialog opciones = new AlertDialog.Builder(ContactList.this)
                         .setItems(opc, new DialogInterface.OnClickListener() {
                             @Override
@@ -146,8 +146,8 @@ public class ContactList extends AppCompatActivity {
                                     input2.setText(con.getNumber());
 
                                     final AlertDialog.Builder alert = new AlertDialog.Builder(ContactList.this);
-                                    alert.setTitle("Editar contacto").setView(textEntryView)
-                                            .setPositiveButton("MODIFICAR",
+                                    alert.setTitle(getString(R.string.editar_contacto)).setView(textEntryView)
+                                            .setPositiveButton(getString(R.string.modificar),
                                                     new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -155,7 +155,7 @@ public class ContactList extends AppCompatActivity {
                                                             mostrarContactos();
                                                         }
                                                     })
-                                            .setNegativeButton("CANCELAR",
+                                            .setNegativeButton(getString(R.string.cancelar),
                                                     new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int whichButton) {
                                              /*

@@ -49,7 +49,7 @@ public class Autentication extends AppCompatActivity {
                     startActivity(new Intent(Autentication.this, Inicio.class));
                 }
                 else {
-                    Snackbar.make(v, "Contraseña incorrecta.", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(v, R.string.pass_incorrecta, Snackbar.LENGTH_LONG).show();
                 }
             }
         });

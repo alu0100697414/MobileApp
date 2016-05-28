@@ -28,14 +28,14 @@
     <item
         android:id="@+id/action_info_usuario"
         android:orderInCategory="110"
-        android:title="Info usuario"
+        android:title="@string/user_info"
         android:icon="@drawable/ic_action_icon_info"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_password"
         android:orderInCategory="120"
-        android:title="Contraseña"
+        android:title="@string/password"
         app:showAsAction="never" />
 
     <item

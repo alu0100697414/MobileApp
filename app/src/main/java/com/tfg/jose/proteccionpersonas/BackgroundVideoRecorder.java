@@ -78,8 +78,8 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
             numero_usuario = contacto.get(0).getNumber();
         }
         else {
-            nombre_usuario = "Sin definir";
-            numero_usuario = "Sin definir";
+            nombre_usuario = getString(R.string.no_definido);
+            numero_usuario = getString(R.string.no_definido);
         }
 
         surfaceView = new SurfaceView(this);
