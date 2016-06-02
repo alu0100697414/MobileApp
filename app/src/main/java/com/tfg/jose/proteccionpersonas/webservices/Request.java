@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.tfg.jose.proteccionpersonas.AESUtil;
 import com.tfg.jose.proteccionpersonas.StreamingConfig;
 
 import org.json.JSONObject;
@@ -20,9 +21,12 @@ public class Request {
     //Función que registra a un usuario en el servicio web la primera vez que usa la app
     public static void newUser(String MAC) {
 
+        String CMac = AESUtil.encrypt(MAC);
+        String CServerLink = AESUtil.encrypt(StreamingConfig.STREAM_SHORT_URL);
+
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("name", MAC);
-        params.put("server", StreamingConfig.STREAM_SHORT_URL);
+        params.put("name", CMac);
+        params.put("server", CServerLink);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.POST, Config.SERVER_URL + "/camara", new JSONObject(params),
                 new com.android.volley.Response.Listener<JSONObject>() {
@@ -56,12 +60,18 @@ public class Request {
 
         String fecha = now.monthDay + "/" + (now.month+1) + "/" + now.year + " - " + hour + ":" + minute;
 
+        String CServer = AESUtil.encrypt(StreamingConfig.STREAM_SHORT_URL);
+        String CNombre = AESUtil.encrypt(name);
+        String CNumero = AESUtil.encrypt(tlf);
+        String CTime_now = AESUtil.encrypt(fecha);
+
+
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("name", MAC);
-        params.put("server", StreamingConfig.STREAM_SHORT_URL);
-        params.put("nombre", name);
-        params.put("numero", tlf);
-        params.put("time_now", fecha);
+        params.put("server", CServer);
+        params.put("nombre", CNombre);
+        params.put("numero", CNumero);
+        params.put("time_now", CTime_now);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, Config.SERVER_URL + "/online/" + MAC, new JSONObject(params),
                 new com.android.volley.Response.Listener<JSONObject>() {
@@ -95,8 +105,10 @@ public class Request {
 
         String fecha = now.monthDay + "/" + (now.month+1) + "/" + now.year + " - " + hour + ":" + minute;
 
+        String CFecha = AESUtil.encrypt(fecha);
+
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("date_last_online", fecha);
+        params.put("date_last_online", CFecha);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, Config.SERVER_URL + "/offline/" + MAC, new JSONObject(params),
                 new com.android.volley.Response.Listener<JSONObject>() {

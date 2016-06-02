@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,11 +20,26 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 public class Inicio extends AppCompatActivity {
 
@@ -79,7 +96,15 @@ public class Inicio extends AppCompatActivity {
         };
 
         executor.scheduleAtFixedRate(searchB, 0, 15, TimeUnit.SECONDS);
+
+        String src = "me";
+        String encrypted = AESUtil.encrypt(src);
+        String decrypted = AESUtil.decrypt(encrypted);
+        System.out.println("src: " + src);
+        System.out.println("encrypted: " + encrypted);
+        System.out.println("decrypted: " + decrypted);
     }
+
 
     // Si se pulsa el botón de atrás, sigue ejecutándose la app
     @Override
