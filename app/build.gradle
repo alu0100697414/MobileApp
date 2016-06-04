@@ -27,4 +27,8 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.0.19'
     compile project(':libstreaming')
     compile 'com.scottyab:aescrypt:0.0.1'
+    compile 'com.madgag.spongycastle:core:1.54.0.0'
+    compile 'com.madgag.spongycastle:prov:1.54.0.0'
+    compile 'com.madgag.spongycastle:pkix:1.54.0.0'
+    compile 'com.madgag.spongycastle:pg:1.54.0.0'
 }

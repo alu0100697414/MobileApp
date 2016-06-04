@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,11 +22,35 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.spongycastle.math.ec.ECCurve;
+import org.spongycastle.util.encoders.Hex;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Security;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.spec.ECFieldFp;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.EllipticCurve;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,14 +58,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.KeyAgreement;
 
 public class Inicio extends AppCompatActivity {
 
@@ -50,6 +69,12 @@ public class Inicio extends AppCompatActivity {
     ScheduledExecutorService executor;
 
     private DBase protectULLDB;
+
+    private static final String CURVE_NAME = "secp160k1";
+
+    static {
+        Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
+    }
 
     // Constructor
     public Inicio(){
@@ -97,12 +122,20 @@ public class Inicio extends AppCompatActivity {
 
         executor.scheduleAtFixedRate(searchB, 0, 15, TimeUnit.SECONDS);
 
-        String src = "me";
-        String encrypted = AESUtil.encrypt(src);
-        String decrypted = AESUtil.decrypt(encrypted);
-        System.out.println("src: " + src);
-        System.out.println("encrypted: " + encrypted);
-        System.out.println("decrypted: " + decrypted);
+        // Se recogen las claves ECDH y se calcula la clave de cifrado. Ejemplo (Pasar a donde esté el AES)
+        try {
+            PublicKey publicMio = KeysReader.getPublic(this,R.raw.pubandroidprotecull);
+            PrivateKey privMio = KeysReader.getPrivate(this, R.raw.privandroidprotectull);
+            Log.i("ECDH", "FINAAAAAAL: " + KeysReader.generarClaveCompartida(privMio,publicMio));
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
     }
 
 
