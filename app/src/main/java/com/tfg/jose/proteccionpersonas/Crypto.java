@@ -35,11 +35,8 @@ import android.util.Log;
 public class Crypto {
 
     private static final String TAG = Crypto.class.getSimpleName();
-
     private static final String PROVIDER = "SC";
-
     private static final String KEGEN_ALG = "ECDH";
-
     private static Crypto instance;
 
     static {

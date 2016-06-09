@@ -6,10 +6,15 @@ import android.util.Log;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.tfg.jose.proteccionpersonas.AESUtil;
+import com.tfg.jose.proteccionpersonas.KeysReader;
 import com.tfg.jose.proteccionpersonas.StreamingConfig;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.HashMap;
 
 /**
@@ -19,15 +24,21 @@ import java.util.HashMap;
 public class Request {
 
     //Función que registra a un usuario en el servicio web la primera vez que usa la app
-    public static void newUser(String MAC) {
+    public static void newUser(String MAC) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
 
-        String CMac = AESUtil.encrypt(MAC);
-        String CServerLink = AESUtil.encrypt(StreamingConfig.STREAM_SHORT_URL);
+        // Generamos la clave secreta con la que cifrará posteriormente el AES
+        String key = KeysReader.generarClaveCompartida(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
 
+        // Ciframos los parametros que le enviamos al servidor web
+        String CMac = AESUtil.encrypt(MAC,key);
+        String CServerLink = AESUtil.encrypt(StreamingConfig.STREAM_SHORT_URL,key);
+
+        // Creamos un hash con todas las variables que vamos a enviar
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("name", CMac);
         params.put("server", CServerLink);
 
+        // Creamos el JSON y lo añadimos a la cola
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.POST, Config.SERVER_URL + "/camara", new JSONObject(params),
                 new com.android.volley.Response.Listener<JSONObject>() {
                     @Override
@@ -47,8 +58,9 @@ public class Request {
 
 
     //Función que establece un video como online
-    public static void streamOnline(String MAC, String name, String tlf) {
+    public static void streamOnline(String MAC, String name, String tlf) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
 
+        // Cogemos la fecha y hora actuales
         Time now = new Time(Time.getCurrentTimezone());
         now.setToNow();
 
@@ -60,12 +72,16 @@ public class Request {
 
         String fecha = now.monthDay + "/" + (now.month+1) + "/" + now.year + " - " + hour + ":" + minute;
 
-        String CServer = AESUtil.encrypt(StreamingConfig.STREAM_SHORT_URL);
-        String CNombre = AESUtil.encrypt(name);
-        String CNumero = AESUtil.encrypt(tlf);
-        String CTime_now = AESUtil.encrypt(fecha);
+        // Generamos la clave secreta con la que cifrará posteriormente el AES
+        String key = KeysReader.generarClaveCompartida(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
 
+        // Ciframos los parametros que le enviamos al servidor web
+        String CServer = AESUtil.encrypt(StreamingConfig.STREAM_SHORT_URL,key);
+        String CNombre = AESUtil.encrypt(name,key);
+        String CNumero = AESUtil.encrypt(tlf,key);
+        String CTime_now = AESUtil.encrypt(fecha,key);
 
+        // Creamos un hash con todas las variables que vamos a enviar
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("name", MAC);
         params.put("server", CServer);
@@ -73,6 +89,7 @@ public class Request {
         params.put("numero", CNumero);
         params.put("time_now", CTime_now);
 
+        // Creamos el JSON y lo añadimos a la cola
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, Config.SERVER_URL + "/online/" + MAC, new JSONObject(params),
                 new com.android.volley.Response.Listener<JSONObject>() {
                     @Override
@@ -92,8 +109,9 @@ public class Request {
 
 
     //Función que establece un video como offline
-    public static void streamOffline(String MAC) {
+    public static void streamOffline(String MAC) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
 
+        // Cogemos la fecha y hora actuales
         Time now = new Time(Time.getCurrentTimezone());
         now.setToNow();
 
@@ -105,11 +123,17 @@ public class Request {
 
         String fecha = now.monthDay + "/" + (now.month+1) + "/" + now.year + " - " + hour + ":" + minute;
 
-        String CFecha = AESUtil.encrypt(fecha);
+        // Generamos la clave secreta con la que cifrará posteriormente el AES
+        String key = KeysReader.generarClaveCompartida(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
 
+        // Ciframos los parametros que le enviamos al servidor web
+        String CFecha = AESUtil.encrypt(fecha,key);
+
+        // Creamos un hash con todas las variables que vamos a enviar
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("date_last_online", CFecha);
 
+        // Creamos el JSON y lo añadimos a la cola
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, Config.SERVER_URL + "/offline/" + MAC, new JSONObject(params),
                 new com.android.volley.Response.Listener<JSONObject>() {
                     @Override

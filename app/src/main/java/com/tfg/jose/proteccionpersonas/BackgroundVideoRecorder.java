@@ -30,6 +30,10 @@ import net.majorkernelpanic.streaming.audio.AudioQuality;
 import net.majorkernelpanic.streaming.gl.SurfaceView;
 import net.majorkernelpanic.streaming.rtsp.RtspClient;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -103,7 +107,19 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
             // Initialize RTSP client
             initRtspClient();
             Config.requestQueue = Volley.newRequestQueue(this);
-            Request.newUser(macAddress);
+            try {
+                Request.newUser(macAddress);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (NoSuchProviderException e) {
+                e.printStackTrace();
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -201,7 +217,19 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
         if (mWifi.isConnected()) {
             toggleStreaming();
 
-            Request.streamOffline(macAddress);
+            try {
+                Request.streamOffline(macAddress);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (NoSuchProviderException e) {
+                e.printStackTrace();
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            }
 
             mClient.release();
             mSession.release();
@@ -256,7 +284,19 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
 
     @Override
     public void onSessionStarted() {
-        Request.streamOnline(macAddress,nombre_usuario,numero_usuario);
+        try {
+            Request.streamOnline(macAddress,nombre_usuario,numero_usuario);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
