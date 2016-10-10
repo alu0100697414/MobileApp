@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.Volley;
 import com.tfg.jose.proteccionpersonas.R;
@@ -106,33 +107,17 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
         gps = new GPSTracker(this);
 
         // Comprueba si el GPS está activado
-        if (gps.canGetLocation()){
+        if (gps.canGetLocation() && gps != null){
             latitude = gps.getLatitude();
             longitude = gps.getLongitude();
-        } else {
-            // Si no está activado, se envía aviso para activarlo
-            gps.showSettingsAlert();
 
+            Toast.makeText(getApplication(), latitude + " y " + longitude, Toast.LENGTH_SHORT).show();
+        } // else {
 //            // Si no está activado, se envía aviso para activarlo
-//            AlertDialog.Builder bt_dialog = new AlertDialog.Builder(this);
-//            bt_dialog.setTitle("Activar GPS");
-//            bt_dialog.setMessage("Por favor, active el servicio GPS por si es necesario enviar su ubicación.");
-//            bt_dialog.setCancelable(false);
-//            bt_dialog.setPositiveButton("Activar", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    Intent toGPSEnable = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//                    startActivity(toGPSEnable);
-//                }
-//            });
-//            bt_dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
+////            gps.showSettingsAlert();
 //
-//                }
-//            });
-//            bt_dialog.show();
-        }
+//
+//        }
 
         // Cogemos la MAC del dispositivo
         WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);

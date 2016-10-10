@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tfg.jose.proteccionpersonas.R;
+import com.tfg.jose.proteccionpersonas.gps.GPSTracker;
 
 import java.security.Security;
 import java.util.ArrayList;
@@ -73,6 +74,34 @@ public class Inicio extends AppCompatActivity {
         pbutton.pushButton(); // Creamos el botón de pánico en la Activity
 
         bluetooth.estaActivado();
+
+        GPSTracker gps;
+        gps = new GPSTracker(this);
+
+        if (!gps.canGetLocation()){
+
+            // Si no está activado, se envía aviso para activarlo
+            AlertDialog.Builder bt_dialog = new AlertDialog.Builder(this);
+            bt_dialog.setTitle("Activar GPS");
+            bt_dialog.setMessage("Por favor, active el servicio GPS por si es necesario enviar su ubicación.");
+            bt_dialog.setCancelable(false);
+            bt_dialog.setPositiveButton("Activar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent toGPSEnable = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(toGPSEnable);
+                }
+            });
+            bt_dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            bt_dialog.show();}
+
+        gps.stopUsingGPS();
+        gps.onDestroy();
 
         // Ejecutamos el servicio de busqueda de dispositivos bluetooth cada x tiempo
         Runnable searchB = new Runnable() {
