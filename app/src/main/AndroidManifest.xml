@@ -18,6 +18,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -27,7 +28,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".Autentication"
+            android:name=".main.Autentication"
             android:label="@string/title_activity_autentication"
             android:theme="@style/AppTheme.NoActionBar">
 
@@ -38,33 +39,33 @@
         </activity>
 
         <activity
-            android:name=".Inicio"
+            android:name=".main.Inicio"
             android:label="@string/inicio_name"
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme.NoActionBar">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tfg.jose.proteccionpersonas.Autentication" />
+                android:value="com.tfg.jose.proteccionpersonas.main.Autentication" />
         </activity>
 
         <activity
-            android:name=".ContactList"
+            android:name=".main.ContactList"
             android:label="@string/title_activity_contact_list"
-            android:parentActivityName=".Inicio"
+            android:parentActivityName=".main.Inicio"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tfg.jose.proteccionpersonas.Inicio" />
+                android:value="com.tfg.jose.proteccionpersonas.main.Inicio" />
         </activity>
 
         <service
-            android:name=".BService"
+            android:name=".main.BService"
             android:enabled="true"
             android:exported="true" />
 
         <service
-            android:name=".BackgroundVideoRecorder"
+            android:name=".main.BackgroundVideoRecorder"
             android:enabled="true"
             android:exported="true" />
 

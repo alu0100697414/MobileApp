@@ -5,9 +5,8 @@ import android.util.Log;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.tfg.jose.proteccionpersonas.AESUtil;
-import com.tfg.jose.proteccionpersonas.KeysReader;
-import com.tfg.jose.proteccionpersonas.StreamingConfig;
+import com.tfg.jose.proteccionpersonas.encrypt.AESUtil;
+import com.tfg.jose.proteccionpersonas.encrypt.KeysReader;
 
 import org.json.JSONObject;
 
@@ -25,6 +24,8 @@ public class Request {
 
     //Función que registra a un usuario en el servicio web la primera vez que usa la app
     public static void newUser(String MAC) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
+
+        Log.i("Prueb", "eeeeeooooooooooo");
 
         // Generamos la clave secreta con la que cifrará posteriormente el AES
         String key = KeysReader.generarClaveCompartida(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());

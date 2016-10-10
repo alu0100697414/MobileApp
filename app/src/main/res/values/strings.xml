@@ -63,13 +63,13 @@
     <string name="msg_agresor_detectado">El agresor ha sido detectado.</string>
     <string name="text_agresor_detectado">El agresor ha sido detectado pero no ha superado la distancia límite.</string>
     <string name="dis_limite_superada">Distancia límite superada.</string>
-    <string name="text_agresor_peligro">El agresor ha sido detectado y además, superó la distancia límite.</string>
+    <string name="text_agresor_peligro">El agresor ha sido detectado y ha superado la distancia límite.</string>
     <string name="grabando_puntos">Grabando...</string>
     <string name="grabacion_encurso">Grabación en curso.</string>
     <string name="user_info">Info usuarip</string>
 
     <string name="a_las">A las</string>
     <string name="del_dia">del día</string>
-    <string name="msg_sms">el agresor/a ha superado la distancia límite. Póngase en contacto con la víctima, y si no contesta, llame al 016 (teléfono gratuito).</string>
+    <string name="msg_sms">el agresor ha superado la distancia límite. Póngase en contacto con la víctima, y si no contesta, llame al 016 (teléfono gratuito).</string>
 
 </resources>
