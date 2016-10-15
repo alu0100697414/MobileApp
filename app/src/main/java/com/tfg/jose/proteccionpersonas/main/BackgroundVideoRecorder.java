@@ -134,7 +134,6 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
             Config.requestQueue = Volley.newRequestQueue(this);
             try {
                 Request.newUser(macAddress);
-                Request.streamOnline(macAddress,nombre_usuario,numero_usuario,latitude,longitude);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
