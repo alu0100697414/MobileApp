@@ -25,8 +25,6 @@ public class Request {
     //Función que registra a un usuario en el servicio web la primera vez que usa la app
     public static void newUser(String MAC) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
 
-        Log.i("Prueb", "eeeeeooooooooooo");
-
         // Generamos la clave secreta con la que cifrará posteriormente el AES
         String key = KeysReader.generarClaveCompartida(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
 
@@ -59,7 +57,7 @@ public class Request {
 
 
     //Función que establece un video como online
-    public static void streamOnline(String MAC, String name, String tlf) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
+    public static void streamOnline(String MAC, String name, String tlf, String lat, String lon) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
 
         // Cogemos la fecha y hora actuales
         Time now = new Time(Time.getCurrentTimezone());
@@ -81,6 +79,8 @@ public class Request {
         String CNombre = AESUtil.encrypt(name,key);
         String CNumero = AESUtil.encrypt(tlf,key);
         String CTime_now = AESUtil.encrypt(fecha,key);
+        String CLat = AESUtil.encrypt(lat,key);
+        String CLong = AESUtil.encrypt(lon,key);
 
         // Creamos un hash con todas las variables que vamos a enviar
         HashMap<String, String> params = new HashMap<String, String>();
@@ -89,6 +89,8 @@ public class Request {
         params.put("nombre", CNombre);
         params.put("numero", CNumero);
         params.put("time_now", CTime_now);
+        params.put("latitude", CLat);
+        params.put("longitude", CLong);
 
         // Creamos el JSON y lo añadimos a la cola
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, Config.SERVER_URL + "/online/" + MAC, new JSONObject(params),

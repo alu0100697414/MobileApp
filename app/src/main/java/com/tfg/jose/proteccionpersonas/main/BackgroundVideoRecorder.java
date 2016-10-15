@@ -66,8 +66,8 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
 
     private String macAddress;
 
-    private double latitude;
-    private double longitude;
+    private String latitude;
+    private String longitude;
 
     @Override
     // Creamos una nueva surfaceview, se le pone tamaño de 1x1 en la parte superior izquierda y se añade el callback para el servicio
@@ -108,10 +108,8 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
 
         // Comprueba si el GPS está activado
         if (gps.canGetLocation() && gps != null){
-            latitude = gps.getLatitude();
-            longitude = gps.getLongitude();
-
-            Toast.makeText(getApplication(), latitude + " y " + longitude, Toast.LENGTH_SHORT).show();
+            latitude = String.valueOf(gps.getLatitude());
+            longitude = String.valueOf(gps.getLongitude());
         } // else {
 //            // Si no está activado, se envía aviso para activarlo
 ////            gps.showSettingsAlert();
@@ -136,7 +134,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
             Config.requestQueue = Volley.newRequestQueue(this);
             try {
                 Request.newUser(macAddress);
-                Request.streamOnline(macAddress,nombre_usuario,numero_usuario);
+                Request.streamOnline(macAddress,nombre_usuario,numero_usuario,latitude,longitude);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -340,7 +338,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
     @Override
     public void onSessionStarted() {
         try {
-            Request.streamOnline(macAddress,nombre_usuario,numero_usuario);
+            Request.streamOnline(macAddress,nombre_usuario,numero_usuario,latitude,longitude);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

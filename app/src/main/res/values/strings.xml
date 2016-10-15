@@ -66,7 +66,7 @@
     <string name="text_agresor_peligro">El agresor ha sido detectado y ha superado la distancia límite.</string>
     <string name="grabando_puntos">Grabando...</string>
     <string name="grabacion_encurso">Grabación en curso.</string>
-    <string name="user_info">Info usuarip</string>
+    <string name="user_info">Info usuario</string>
 
     <string name="a_las">A las</string>
     <string name="del_dia">del día</string>
