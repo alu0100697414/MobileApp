@@ -41,6 +41,7 @@ import java.net.NetworkInterface;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -60,6 +61,8 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
     private DBase protectULLDB;
 
     private NetworkInfo mWifi;
+
+    private List<String> info_server;
 
     private String nombre_usuario;
     private String numero_usuario;
@@ -83,6 +86,15 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
 
         // Inicializamos la base de datos
         protectULLDB = new DBase(getApplicationContext());
+
+        info_server = new ArrayList<String>();
+        info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+        Log.i("HOLAAA",info_server.get(0));
+        Log.i("HOLAAA",info_server.get(1));
+        Log.i("HOLAAA",info_server.get(2));
+        Log.i("HOLAAA",info_server.get(3));
+        Log.i("HOLAAA",info_server.get(4));
 
         List<Contact> contacto;
         contacto = protectULLDB.recuperarINFO_USUARIO();
@@ -133,7 +145,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
             initRtspClient();
             Config.requestQueue = Volley.newRequestQueue(this);
             try {
-                Request.newUser(macAddress);
+                Request.newUser(macAddress,info_server.get(4).toString(),info_server.get(0).toString());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -233,13 +245,13 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
 
         // We parse the URI written in the Editext
         Pattern uri = Pattern.compile("rtsp://(.+):(\\d+)/(.+)");
-        Matcher m = uri.matcher(StreamingConfig.STREAM_URL + macAddress);
+        Matcher m = uri.matcher(info_server.get(1).toString() + macAddress);
         m.find();
         ip = m.group(1);
         port = m.group(2);
         path = m.group(3);
 
-        mClient.setCredentials(StreamingConfig.PUBLISHER_USERNAME, StreamingConfig.PUBLISHER_PASSWORD);
+        mClient.setCredentials(info_server.get(2).toString(), info_server.get(3).toString());
         mClient.setServerAddress(ip, Integer.parseInt(port));
         mClient.setStreamPath("/" + path);
     }
@@ -270,7 +282,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
             toggleStreaming();
 
             try {
-                Request.streamOffline(macAddress);
+                Request.streamOffline(macAddress,info_server.get(0).toString());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -337,7 +349,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
     @Override
     public void onSessionStarted() {
         try {
-            Request.streamOnline(macAddress,nombre_usuario,numero_usuario,latitude,longitude);
+            Request.streamOnline(macAddress,nombre_usuario,numero_usuario,latitude,longitude,info_server.get(4).toString(),info_server.get(0).toString());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

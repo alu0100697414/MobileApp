@@ -39,6 +39,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_server"
+        android:orderInCategory="125"
+        android:title="@string/action_server"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_exit"
         android:orderInCategory="130"
         android:title="@string/exit"

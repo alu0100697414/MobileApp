@@ -62,4 +62,5 @@
     <string name="mensaje_peligro">The aggresor has passed the set distance. The aggressor has been detected at approximately:</string>
     <string name="update_pass_text">Make sure your password is regularly updated to avoid compromising your application.</string>
     <string name="update_text">For security reasons, keep your contact information up to date.</string>
+    <string name="action_server">Change server</string>
 </resources>

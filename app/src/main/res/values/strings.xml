@@ -15,6 +15,7 @@
     <string name="video">Grabación</string>
     <string name="Titulo">Datos del dispositivo del agresor</string>
     <string name="Titulo_Encontrado">Estado</string>
+    <string name="action_server">Config server</string>
 
     <string name="title_activity_contact_" translatable="false">Contact_Activity</string>
     <string name="title_activity_contact_list">Contactos</string>

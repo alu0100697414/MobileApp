@@ -5,9 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Created by jose on 1/03/16.
@@ -21,7 +24,8 @@ public class DBase extends SQLiteOpenHelper {
     private static final String TABLA_CONTACTOS = "CREATE TABLE contactos (telefono TEXT PRIMARY KEY, nombre TEXT, activo INTEGER)";
     private static final String TABLA_INFO_USUARIO = "CREATE TABLE tabla_info_usuario (telefono TEXT PRIMARY KEY, nombre TEXT)";
     private static final String TABLA_CONFIG_APP = "CREATE TABLE tabla_config_app (id TEXT PRIMARY KEY, password TEXT)";
-    private static final int VERSION_BASEDATOS = 5;
+    private static final String TABLA_INFO_SERVIDOR = "CREATE TABLE tabla_info_servidor (id TEXT PRIMARY KEY, server_url TEXT, url_streaming TEXT, user_server TEXT, pass_server TEXT, short_url TEXT)";
+    private static final int VERSION_BASEDATOS = 7;
 
     // Constructor de la clase
     public DBase(Context context) {
@@ -35,6 +39,7 @@ public class DBase extends SQLiteOpenHelper {
         db.execSQL(TABLA_CONTACTOS);
         db.execSQL(TABLA_INFO_USUARIO);
         db.execSQL(TABLA_CONFIG_APP);
+        db.execSQL(TABLA_INFO_SERVIDOR);
     }
 
     @Override
@@ -42,6 +47,7 @@ public class DBase extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLA_CONTACTOS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLA_INFO_USUARIO);
         db.execSQL("DROP TABLE IF EXISTS " + TABLA_CONFIG_APP);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLA_INFO_SERVIDOR);
         onCreate(db);
     }
 
@@ -232,6 +238,63 @@ public class DBase extends SQLiteOpenHelper {
         c.close();
 
         return pass;
+    }
+
+
+    // METODOS DE LA TABLA INFO SERVER
+    // Inserta la info del server
+    public void insertarINFO_SERVER(String id, String url_server, String streaming_url, String server_user, String pass_server, String shor_url) {
+        SQLiteDatabase db = getWritableDatabase();
+        if(db != null){
+            ContentValues valores = new ContentValues();
+            valores.put("id", id);
+            valores.put("server_url", url_server);
+            valores.put("url_streaming", streaming_url);
+            valores.put("user_server", server_user);
+            valores.put("pass_server", pass_server);
+            valores.put("short_url", shor_url);
+            db.insert("tabla_info_servidor", null, valores);
+            db.close();
+        }
+    }
+
+    // Edita la info del server
+    public void modificarINFO_SERVER(String id, String url_server, String streaming_url, String server_user, String pass_server, String shor_url){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues valores = new ContentValues();
+        valores.put("id", id);
+        valores.put("server_url", url_server);
+        valores.put("url_streaming", streaming_url);
+        valores.put("user_server", server_user);
+        valores.put("pass_server", pass_server);
+        valores.put("short_url", shor_url);
+        db.update("tabla_info_servidor", valores, id, null);
+        db.close();
+    }
+
+    // Devuelve la info del server
+    public List<String> recuperarINFO_SERVER(String id) {
+
+        SQLiteDatabase db = getReadableDatabase();
+        String[] valores_recuperar = {"server_url","url_streaming","user_server","pass_server","short_url"};
+        Cursor c = db.query("tabla_info_servidor", valores_recuperar, id, null, null, null, null, null);
+
+        List<String> info = new ArrayList<String>();
+        if(c != null) {
+            c.moveToFirst();
+            if(c.getCount() > 0){
+                info.add(c.getString(0));
+                info.add(c.getString(1));
+                info.add(c.getString(2));
+                info.add(c.getString(3));
+                info.add(c.getString(4));
+            }
+        }
+
+        db.close();
+        c.close();
+
+        return info;
     }
 }
 

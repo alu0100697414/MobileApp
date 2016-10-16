@@ -11,6 +11,7 @@ import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -280,6 +281,69 @@ public class Inicio extends AppCompatActivity {
                                 }
                             });
             alert.show();
+        }
+
+        if (id == R.id.action_server) {
+
+            LayoutInflater factory = LayoutInflater.from(Inicio.this);
+
+            final View textEntryView = factory.inflate(R.layout.server_layout, null);
+
+            List<String> info_server = new ArrayList<String>();
+            info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+            final EditText url_servidor = (EditText) textEntryView.findViewById(R.id.url_servidor);
+            final EditText url_streaming = (EditText) textEntryView.findViewById(R.id.url_streaming);
+            final EditText user_server = (EditText) textEntryView.findViewById(R.id.user_server);
+            final EditText pass_server = (EditText) textEntryView.findViewById(R.id.pass_server);
+            final EditText short_streaming_url = (EditText) textEntryView.findViewById(R.id.short_streaming_url);
+
+            if(!info_server.isEmpty()){
+                Log.i("VARSBD",info_server.get(0));
+                Log.i("VARSBD",info_server.get(1));
+                Log.i("VARSBD",info_server.get(2));
+                Log.i("VARSBD",info_server.get(3));
+                Log.i("VARSBD",info_server.get(4));
+
+                url_servidor.setText(info_server.get(0));
+                url_streaming.setText(info_server.get(1));
+                user_server.setText(info_server.get(2));
+                pass_server.setText(info_server.get(3));
+                short_streaming_url.setText(info_server.get(4));
+            }
+
+            final Context context = this;
+
+            final View vista = this.findViewById(android.R.id.content);
+
+            final AlertDialog.Builder alert = new AlertDialog.Builder(Inicio.this);
+            alert.setTitle("Configurar acceso servidor")
+                    .setView(textEntryView)
+                    .setPositiveButton(getString(R.string.actualizar),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+
+                                    protectULLDB.modificarINFO_SERVER("1",url_servidor.getText().toString(),url_streaming.getText().toString(),user_server.getText().toString(),pass_server.getText().toString(),short_streaming_url.getText().toString());
+                                    Snackbar.make(vista, "Información del servidor actualizada.", Snackbar.LENGTH_LONG).show();
+
+
+
+//                                    if (password.getText().toString().equals(confirm_password.getText().toString())) {
+//                                        protectULLDB.modificarCONFIG_APP("1", password.getText().toString());
+//                                        Snackbar.make(vista, getString(R.string.updated_pass), Snackbar.LENGTH_LONG).show();
+//                                    } else {
+//                                        Snackbar.make(vista, getString(R.string.updated_pass_error), Snackbar.LENGTH_LONG).show();
+//                                    }
+                                }
+                            })
+                    .setNegativeButton(getString(R.string.cancelar),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+
+                                }
+                            });
+            alert.show();
+
         }
 
         // Botón para cerrar la app.
