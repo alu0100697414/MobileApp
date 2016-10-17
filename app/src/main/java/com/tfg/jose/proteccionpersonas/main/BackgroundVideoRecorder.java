@@ -90,12 +90,6 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
         info_server = new ArrayList<String>();
         info_server = protectULLDB.recuperarINFO_SERVER("1");
 
-        Log.i("HOLAAA",info_server.get(0));
-        Log.i("HOLAAA",info_server.get(1));
-        Log.i("HOLAAA",info_server.get(2));
-        Log.i("HOLAAA",info_server.get(3));
-        Log.i("HOLAAA",info_server.get(4));
-
         List<Contact> contacto;
         contacto = protectULLDB.recuperarINFO_USUARIO();
 
@@ -122,12 +116,11 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
         if (gps.canGetLocation() && gps != null){
             latitude = String.valueOf(gps.getLatitude());
             longitude = String.valueOf(gps.getLongitude());
-        } // else {
-//            // Si no está activado, se envía aviso para activarlo
-////            gps.showSettingsAlert();
-//
-//
-//        }
+        } else {
+//            gps.showSettingsAlert();
+            latitude = "null";
+            longitude = "null";
+        }
 
         // Cogemos la MAC del dispositivo
         WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
