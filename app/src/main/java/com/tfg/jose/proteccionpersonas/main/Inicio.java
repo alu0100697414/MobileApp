@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Inicio extends AppCompatActivity {
 
-    private BluetoothConnection bluetooth;
     private PanicButton pbutton;
     private Notification notifi;
 
@@ -40,13 +39,14 @@ public class Inicio extends AppCompatActivity {
 
     private DBase protectULLDB;
 
+    private BLEConnection bleConnection;
+
     static {
         Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
     }
 
     // Constructor
     public Inicio(){
-        bluetooth = new BluetoothConnection(Inicio.this, this);
         pbutton = new PanicButton(Inicio.this, this);
         notifi = new Notification(Inicio.this, this);
 
@@ -67,14 +67,10 @@ public class Inicio extends AppCompatActivity {
         // Inicializamos la base de datos
         protectULLDB = new DBase(getApplicationContext());
 
-        // Filtro para cuando encuentre dispositivos bluetooth
-        IntentFilter bluetoothFilter = new IntentFilter();
-        bluetoothFilter.addAction(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(bluetooth.getReceiver(), bluetoothFilter);
-
         pbutton.pushButton(); // Creamos el botón de pánico en la Activity
 
-        bluetooth.estaActivado();
+        bleConnection = new BLEConnection(Inicio.this,this);
+        bleConnection.estaActivado();
 
         GPSTracker gps;
         gps = new GPSTracker(this);
@@ -108,15 +104,16 @@ public class Inicio extends AppCompatActivity {
         Runnable searchB = new Runnable() {
             public void run() {
 
-                startService(new Intent(Inicio.this, BService.class));
+                if(bleConnection.isDiscovering()){
+                    bleConnection.stopScanBLEDevices();
+                }
 
-                bluetooth.sinPeligro(); // Si tras 12s no lo encuentra, muestra mensaje de que no hay peligro
-
-                invalidateOptionsMenu(); // Refrescamos el menu
+                bleConnection.sinPeligro();
+                bleConnection.startScanBLEDevices();
             }
         };
 
-        executor.scheduleAtFixedRate(searchB, 0, 15, TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(searchB, 0, 10, TimeUnit.SECONDS);
     }
 
 
@@ -141,7 +138,7 @@ public class Inicio extends AppCompatActivity {
 
         // Mostramos el botón de activar el bluetooth si no está activado.
         MenuItem bt = menu.findItem(R.id.bluetooth);
-        if(bluetooth.getBTAdapter().isEnabled()) {
+        if(bleConnection.bleState()) {
             bt.setVisible(false);
         } else {
             bt.setVisible(true);
@@ -149,7 +146,7 @@ public class Inicio extends AppCompatActivity {
 
         // Cambiamos el título del botón de la cámara dependiendo de su estado.
         MenuItem video = menu.findItem(R.id.video);
-        if(bluetooth.isMyServiceRunning(BackgroundVideoRecorder.class) == true) {
+        if(bleConnection.isMyServiceRunning(BackgroundVideoRecorder.class) == true) {
             video.setTitle(R.string.parar_grabacion);
         } else {
             video.setTitle(R.string.iniciar_grabacion);
@@ -170,7 +167,7 @@ public class Inicio extends AppCompatActivity {
 
 
         if(id == R.id.video){
-            if(bluetooth.isMyServiceRunning(BackgroundVideoRecorder.class) == true){
+            if(bleConnection.isMyServiceRunning(BackgroundVideoRecorder.class) == true){
                 stopService(new Intent(this, BackgroundVideoRecorder.class));
                 invalidateOptionsMenu(); // Refrecamos el menú
 
@@ -190,7 +187,7 @@ public class Inicio extends AppCompatActivity {
 
         // Activa el bluetooth
         if(id == R.id.bluetooth){
-            bluetooth.estaActivado();
+            bleConnection.estaActivado();
         }
 
         // Sale pestaá para actualizar la info del usuario
@@ -396,24 +393,14 @@ public class Inicio extends AppCompatActivity {
         }
     }
 
-    // Devuelve el objeto de la clase Bluetooth Connection
-    BluetoothConnection getBluetoothConnection(){
-        return bluetooth;
-    }
-
-    // Devuelve el objeto de las notificaciones
-    Notification getNotifi(){
-        return notifi;
-    }
-
     // Destructor para cuando se cierre el programa
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        bluetooth.estaBuscando(); // Vuelvo a comprobar que esté parada la busqueda de dispositivos
-        unregisterReceiver(bluetooth.getReceiver());
-
+        if(bleConnection.isDiscovering()){
+            bleConnection.stopScanBLEDevices();
+        }
 
         if(!executor.isShutdown()){
             executor.shutdown();

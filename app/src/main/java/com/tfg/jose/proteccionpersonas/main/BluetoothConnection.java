@@ -20,6 +20,9 @@ import java.text.DecimalFormat;
  * Created by jose on 29/01/16.
  *
  * Clase que se encarga de la búsqueda de dispositivos a través de Bluetooth.
+ *
+ * LOG: Clase en desuso desde el 22/10/2016. Ahora se detecta al dispositivo
+ * usando BLE en vez de las librerías clásicas de Bluetooh.
  */
 
 public class BluetoothConnection {

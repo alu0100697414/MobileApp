@@ -163,7 +163,7 @@ public class KeysReader {
     }
 
     public static void savePubKeyServer(PublicKey pkey) throws IOException {
-        FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/KPubServer.ser");
+        FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/serverpub.ser");
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(pkey);
         oos.close();
@@ -171,7 +171,7 @@ public class KeysReader {
     }
 
     public static void savePrivKeyClient(PrivateKey pkey) throws IOException {
-        FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/KPrivClient.ser");
+        FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/clientpri.ser");
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(pkey);
         oos.close();
@@ -179,7 +179,7 @@ public class KeysReader {
     }
 
     public static void savePubKeyClient(PublicKey pkey) throws IOException {
-        FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/KPubClient.ser");
+        FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/clientpub.ser");
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(pkey);
         oos.close();
@@ -196,7 +196,7 @@ public class KeysReader {
     }
 
     public static PublicKey getPubKeyServer() throws IOException, ClassNotFoundException {
-        FileInputStream fis = new FileInputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/KPubServer.ser");
+        FileInputStream fis = new FileInputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/serverpub.ser");
         ObjectInputStream ois = new ObjectInputStream(fis);
         PublicKey key = (PublicKey) ois.readObject();
         ois.close();
@@ -205,7 +205,7 @@ public class KeysReader {
     }
 
     public static PrivateKey getPrivKeyClient() throws IOException, ClassNotFoundException {
-        FileInputStream fis = new FileInputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/KPrivClient.ser");
+        FileInputStream fis = new FileInputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/clientpri.ser");
         ObjectInputStream ois = new ObjectInputStream(fis);
         PrivateKey key = (PrivateKey) ois.readObject();
         ois.close();
@@ -214,7 +214,7 @@ public class KeysReader {
     }
 
     public static PublicKey getPubKeyClient() throws IOException, ClassNotFoundException {
-        FileInputStream fis = new FileInputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/KPubClient.ser");
+        FileInputStream fis = new FileInputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/clientpub.ser");
         ObjectInputStream ois = new ObjectInputStream(fis);
         PublicKey key = (PublicKey) ois.readObject();
         ois.close();
