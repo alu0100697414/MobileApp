@@ -1,8 +1,10 @@
-package com.tfg.jose.proteccionpersonas.main;
+package com.tfg.jose.proteccionpersonas.disuse;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+
+import com.tfg.jose.proteccionpersonas.main.Inicio;
 
 /*
 

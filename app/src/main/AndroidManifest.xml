@@ -60,7 +60,7 @@
         </activity>
 
         <service
-            android:name=".main.BService"
+            android:name=".disuse.BService"
             android:enabled="true"
             android:exported="true" />
 

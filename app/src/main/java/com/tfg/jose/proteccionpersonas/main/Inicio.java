@@ -33,13 +33,11 @@ import java.util.concurrent.TimeUnit;
 public class Inicio extends AppCompatActivity {
 
     private PanicButton pbutton;
-    private Notification notifi;
+    private Notification mNotification;
+    private DBase protectULLDB;
+    private BLEConnection bleConnection;
 
     ScheduledExecutorService executor;
-
-    private DBase protectULLDB;
-
-    private BLEConnection bleConnection;
 
     static {
         Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
@@ -48,7 +46,7 @@ public class Inicio extends AppCompatActivity {
     // Constructor
     public Inicio(){
         pbutton = new PanicButton(Inicio.this, this);
-        notifi = new Notification(Inicio.this, this);
+        mNotification = new Notification(Inicio.this, this);
 
         executor = Executors.newScheduledThreadPool(1);
     }
@@ -76,7 +74,6 @@ public class Inicio extends AppCompatActivity {
         gps = new GPSTracker(this);
 
         if (!gps.canGetLocation()){
-
             // Si no está activado, se envía aviso para activarlo
             AlertDialog.Builder bt_dialog = new AlertDialog.Builder(this);
             bt_dialog.setTitle("Activar GPS");
@@ -95,7 +92,8 @@ public class Inicio extends AppCompatActivity {
 
                 }
             });
-            bt_dialog.show();}
+            bt_dialog.show();
+        }
 
         gps.stopUsingGPS();
         gps.onDestroy();
@@ -103,7 +101,6 @@ public class Inicio extends AppCompatActivity {
         // Ejecutamos el servicio de busqueda de dispositivos bluetooth cada x tiempo
         Runnable searchB = new Runnable() {
             public void run() {
-
                 if(bleConnection.isDiscovering()){
                     bleConnection.stopScanBLEDevices();
                 }
@@ -130,7 +127,6 @@ public class Inicio extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_inicio, menu);
-
         return true;
     }
 
@@ -165,7 +161,6 @@ public class Inicio extends AppCompatActivity {
             startActivity(new Intent(Inicio.this,ContactList.class));
         }
 
-
         if(id == R.id.video){
             if(bleConnection.isMyServiceRunning(BackgroundVideoRecorder.class) == true){
                 stopService(new Intent(this, BackgroundVideoRecorder.class));
@@ -192,9 +187,7 @@ public class Inicio extends AppCompatActivity {
 
         // Sale pestaá para actualizar la info del usuario
         if(id == R.id.action_info_usuario){
-
             LayoutInflater factory = LayoutInflater.from(Inicio.this);
-
             final View textEntryView = factory.inflate(R.layout.add_contact_dialog, null);
 
             List<Contact> contacto = new ArrayList<Contact>();
@@ -206,9 +199,7 @@ public class Inicio extends AppCompatActivity {
             final EditText input2 = (EditText) textEntryView.findViewById(R.id.contact_phone);
 
             if(!contacto.isEmpty()){
-
                 Contact con = new Contact(contacto.get(0).getName(),contacto.get(0).getNumber(),1);
-
                 input1.setText(con.getName());
                 input2.setText(con.getNumber());
             }
@@ -231,26 +222,18 @@ public class Inicio extends AppCompatActivity {
                                  })
                             .setNegativeButton(getString(R.string.cancelar),
                                     new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int whichButton) {
-                                             /*
-                                             * User clicked cancel so do some stuff
-                                             */
-                            }
+                                        public void onClick(DialogInterface dialog, int whichButton) {}
                          });
             alert.show();
         }
 
         // Sale pestaá para actualizar la info del usuario
         if(id == R.id.action_password){
-
             LayoutInflater factory = LayoutInflater.from(Inicio.this);
-
             final View textEntryView = factory.inflate(R.layout.password_menu, null);
 
             final EditText password = (EditText) textEntryView.findViewById(R.id.password_user);
             final EditText confirm_password = (EditText) textEntryView.findViewById(R.id.password_user_confirm);
-
-            final Context context = this;
 
             final View vista = this.findViewById(android.R.id.content);
 
@@ -271,19 +254,13 @@ public class Inicio extends AppCompatActivity {
                             })
                     .setNegativeButton(getString(R.string.cancelar),
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                             /*
-                                             * User clicked cancel so do some stuff
-                                             */
-                                }
+                                public void onClick(DialogInterface dialog, int whichButton) {}
                             });
             alert.show();
         }
 
         if (id == R.id.action_server) {
-
             LayoutInflater factory = LayoutInflater.from(Inicio.this);
-
             final View textEntryView = factory.inflate(R.layout.server_layout, null);
 
             List<String> info_server = new ArrayList<String>();
@@ -296,20 +273,12 @@ public class Inicio extends AppCompatActivity {
             final EditText short_streaming_url = (EditText) textEntryView.findViewById(R.id.short_streaming_url);
 
             if(!info_server.isEmpty()){
-                Log.i("VARSBD",info_server.get(0));
-                Log.i("VARSBD",info_server.get(1));
-                Log.i("VARSBD",info_server.get(2));
-                Log.i("VARSBD",info_server.get(3));
-                Log.i("VARSBD",info_server.get(4));
-
                 url_servidor.setText(info_server.get(0));
                 url_streaming.setText(info_server.get(1));
                 user_server.setText(info_server.get(2));
                 pass_server.setText(info_server.get(3));
                 short_streaming_url.setText(info_server.get(4));
             }
-
-            final Context context = this;
 
             final View vista = this.findViewById(android.R.id.content);
 
@@ -319,25 +288,13 @@ public class Inicio extends AppCompatActivity {
                     .setPositiveButton(getString(R.string.actualizar),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-
                                     protectULLDB.modificarINFO_SERVER("1",url_servidor.getText().toString(),url_streaming.getText().toString(),user_server.getText().toString(),pass_server.getText().toString(),short_streaming_url.getText().toString());
                                     Snackbar.make(vista, "Información del servidor actualizada.", Snackbar.LENGTH_LONG).show();
-
-
-
-//                                    if (password.getText().toString().equals(confirm_password.getText().toString())) {
-//                                        protectULLDB.modificarCONFIG_APP("1", password.getText().toString());
-//                                        Snackbar.make(vista, getString(R.string.updated_pass), Snackbar.LENGTH_LONG).show();
-//                                    } else {
-//                                        Snackbar.make(vista, getString(R.string.updated_pass_error), Snackbar.LENGTH_LONG).show();
-//                                    }
                                 }
                             })
                     .setNegativeButton(getString(R.string.cancelar),
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-
-                                }
+                                public void onClick(DialogInterface dialog, int whichButton) {}
                             });
             alert.show();
 
@@ -345,7 +302,6 @@ public class Inicio extends AppCompatActivity {
 
         // Botón para cerrar la app.
         if(id == R.id.action_exit){
-            // Muestro alerta para confirmación.
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.aviso))
                     .setMessage(getString(R.string.cerrar_app_text))
@@ -366,16 +322,13 @@ public class Inicio extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // Callback para cuando se devuelve algun estado
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
         // Si activo el Bluetooth
         if (resultCode == -1) {
             System.exit(0); // Reiniciamos la API para que no haya problema a la hora de buscar dispositivos
             this.startActivity(new Intent(this.getApplicationContext(), Inicio.class));
-
             invalidateOptionsMenu(); // Refrescamos el menú
-
             Toast.makeText(Inicio.this, R.string.b_activado, Toast.LENGTH_SHORT).show();
         }
 
@@ -389,11 +342,10 @@ public class Inicio extends AppCompatActivity {
 
             invalidateOptionsMenu(); // Refrecamos el menú
 
-            notifi.bluetooth_desactivado();
+            mNotification.bluetooth_desactivado();
         }
     }
 
-    // Destructor para cuando se cierre el programa
     @Override
     public void onDestroy() {
         super.onDestroy();

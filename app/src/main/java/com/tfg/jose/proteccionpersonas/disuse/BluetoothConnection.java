@@ -1,4 +1,4 @@
-package com.tfg.jose.proteccionpersonas.main;
+package com.tfg.jose.proteccionpersonas.disuse;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -13,6 +13,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.tfg.jose.proteccionpersonas.R;
+import com.tfg.jose.proteccionpersonas.main.BackgroundVideoRecorder;
+import com.tfg.jose.proteccionpersonas.main.Inicio;
+import com.tfg.jose.proteccionpersonas.main.Notification;
 
 import java.text.DecimalFormat;
 

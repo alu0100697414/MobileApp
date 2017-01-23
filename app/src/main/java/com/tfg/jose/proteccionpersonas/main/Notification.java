@@ -38,7 +38,7 @@ public class Notification {
     }
 
     // Notificación cuando es detectado pero no sobreapasa el radio.
-    void bluetooth_desactivado(){
+    public void bluetooth_desactivado(){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
 
         Intent intent = new Intent(mContext, Inicio.class);
@@ -63,7 +63,7 @@ public class Notification {
     }
 
     // Notificación cuando es detectado pero no sobreapasa el radio.
-    void notificar_radio(){
+    public void notificar_radio(){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
 
         Intent intent = new Intent(mContext, Inicio.class);
@@ -85,7 +85,7 @@ public class Notification {
     }
 
     // Notificación cuando sobrepasa el radio.
-    void notificar_limite(){
+    public void notificar_limite(){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
 
         Intent intent = new Intent(mContext, Inicio.class);
@@ -128,7 +128,7 @@ public class Notification {
     }
 
     // Funcion que envía los sms
-    void enviar_sms(){
+    public void enviar_sms(){
 
         protectULLDB = new DBase(mContext.getApplicationContext());
 
@@ -162,7 +162,7 @@ public class Notification {
         return sms_enviado;
     }
 
-    void setSms_enviado(int n){
+    public void setSms_enviado(int n){
         sms_enviado = n;
     }
 }
