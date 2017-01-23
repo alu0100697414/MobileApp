@@ -32,42 +32,36 @@ public class BLEConnection {
     private Context mContext;
     private Activity mActivity;
 
-    private Notification notifi;
+    private Notification mNotification;
 
     private boolean deviceFound; // True si encuentra el dispositivo
     private double px;  // Valor de intensidad de señal entre dos dispositivos a un metro de distancia.
 
     private final static int REQUEST_ENABLE_BT = 1;
+    private int limitDistance;
 
     private BluetoothManager btManager;
     private BluetoothAdapter btAdapter;
-
-    private String direccion_dispositivo;
-    private int distancia_limite;
 
     // Constructor
     public BLEConnection(Context context, Activity activity){
         this.mContext = context;
         this.mActivity = activity;
 
-        this.notifi = new Notification(context, activity);
+        this.mNotification = new Notification(context, activity);
 
         btManager = (BluetoothManager)activity.getSystemService(Context.BLUETOOTH_SERVICE);
         btAdapter = btManager.getAdapter();
 
         this.deviceFound = false;
-
         this.px = -54;
-
-//        this.nombre_dispositivo = "jose-TravelMate-5742-0";
-        this.direccion_dispositivo = "F4:BE:76:06:43:75";
-        this.distancia_limite = 30;
+        this.limitDistance = 30;
 
         btAdapter.startLeScan(leScanCallback);
     }
 
     // Si está desactivado el Bluetooth, enviamos mensaje para activarlo
-    void estaActivado(){
+    void isActivated(){
         if (!btAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             mActivity.startActivityForResult(enableIntent,REQUEST_ENABLE_BT);
@@ -108,9 +102,9 @@ public class BLEConnection {
     }
 
     // Si no encuentra nada tras doce segundos
-    void sinPeligro(){
-        //delay in ms
-        int DELAY = 12000;
+    void withoutDanger(){
+
+        int DELAY = 12000; // En ms
 
         // Si cuando se acaba la búsqueda, no lo encontró, no hay peligro
         Handler handler = new Handler(Looper.getMainLooper());
@@ -125,7 +119,8 @@ public class BLEConnection {
                 if (deviceFound == false && btAdapter.isEnabled()) {
                     btAdapter.stopLeScan(leScanCallback);
 
-                    notifi.setSms_enviado(0); // Acutlizamos a 0 para si vuelve a encotnrar al agresor
+                    // Acutlizamos a 0 para si vuelve a encotnrar al agresor
+                    mNotification.setSms_enviado(0);
 
                     rssi_msg.setText(mContext.getString(R.string.sin_peligro));
                     rssi_dist.setText("");
@@ -136,7 +131,7 @@ public class BLEConnection {
                     rssi_msg.setText(mContext.getString(R.string.b_desactivado));
                     rssi_dist.setText("");
 
-                    notifi.bluetooth_desactivado();
+                    mNotification.bluetooth_desactivado();
                 } else {
                     deviceFound = false;
                 }
@@ -167,44 +162,41 @@ public class BLEConnection {
                 TextView rssi_msg = (TextView) mActivity.findViewById(R.id.res_busqueda);
                 TextView res_dist = (TextView) mActivity.findViewById(R.id.res_distancia);
 
-                // Si está dentro de la distancia límite se le avisa
-                if(distance < distancia_limite){
+                // Si el agresor supera la distancia límite
+                if(distance < limitDistance){
 
                     rssi_msg.setText(mContext.getString(R.string.peligro) + "\n" + mContext.getString(R.string.mensaje_peligro));
                     res_dist.setText(rdistance + "m");
 
-                    // Notificación del límite superado
-                    notifi.notificar_limite();
+                    // Notificamos a la víctima
+                    mNotification.notificar_limite();
 
-                    // Envío de aviso a los contactos
-                    notifi.enviar_sms();
-                    notifi.setSms_enviado(1);
+                    // Notificamos a los contactos
+                    mNotification.enviar_sms();
+                    mNotification.setSms_enviado(1);
 
-                    // Abre la activity, si esta cerrada, con los resultados
+                    // Abrimos aplicación si está en segundo plano
                     if(mActivity.hasWindowFocus() == false) {
                         Intent intento = new Intent(mContext, Inicio.class);
                         intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                         mContext.startActivity(intento);
                     }
 
-                    // Iniciamos el servicio con la grabación de vídeo
+                    // Comenzamos el vídeo streaming automáticamente
                     if(isMyServiceRunning(BackgroundVideoRecorder.class) == false){
                         mContext.startService(new Intent(mContext, BackgroundVideoRecorder.class));
                     }
 
-                    TextView grabando = (TextView) mActivity.findViewById(R.id.grabando);
-                    grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
-                    grabando.setVisibility(View.VISIBLE);
-                }
-
-                // Si lo encuentra pero no la supera, se le dice
-                else {
-
+                    TextView recording = (TextView) mActivity.findViewById(R.id.grabando);
+                    recording.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
+                    recording.setVisibility(View.VISIBLE);
+                } else {
+                    // Si lo encuentra pero no la supera, se le dice
                     rssi_msg.setText(mContext.getString(R.string.mensaje_aviso));
                     res_dist.setText(rdistance + "m");
 
                     // Notificación de que se encuentra por los alrededores
-                    notifi.notificar_radio();
+                    mNotification.notificar_radio();
                 }
 
                 mActivity.invalidateOptionsMenu(); // Refrescamos el menú

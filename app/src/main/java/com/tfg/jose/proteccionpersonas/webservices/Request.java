@@ -26,7 +26,7 @@ public class Request {
     public static void newUser(String MAC, String short_url, String server_url) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
 
         // Generamos la clave secreta con la que cifrará posteriormente el AES
-        String key = KeysReader.generarClaveCompartida(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
+        String key = KeysReader.generateSharedKey(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
 
         // Ciframos los parametros que le enviamos al servidor web
         String CMac = AESUtil.encrypt(MAC,key);
@@ -72,7 +72,7 @@ public class Request {
         String fecha = now.monthDay + "/" + (now.month+1) + "/" + now.year + " - " + hour + ":" + minute;
 
         // Generamos la clave secreta con la que cifrará posteriormente el AES
-        String key = KeysReader.generarClaveCompartida(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
+        String key = KeysReader.generateSharedKey(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
 
         // Ciframos los parametros que le enviamos al servidor web
         String CServer = AESUtil.encrypt(short_url,key);
@@ -127,7 +127,7 @@ public class Request {
         String fecha = now.monthDay + "/" + (now.month+1) + "/" + now.year + " - " + hour + ":" + minute;
 
         // Generamos la clave secreta con la que cifrará posteriormente el AES
-        String key = KeysReader.generarClaveCompartida(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
+        String key = KeysReader.generateSharedKey(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
 
         // Ciframos los parametros que le enviamos al servidor web
         String CFecha = AESUtil.encrypt(fecha,key);

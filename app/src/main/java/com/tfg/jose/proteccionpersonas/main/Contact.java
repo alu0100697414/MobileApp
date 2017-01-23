@@ -9,13 +9,13 @@ package com.tfg.jose.proteccionpersonas.main;
 public class Contact {
 
     private String name;
-    private String telefono;
-    private int activo;
+    private String numberphone;
+    private int active;
 
     public Contact(String nm, String num, int act){
         name = nm;
-        telefono = num;
-        activo = act;
+        numberphone = num;
+        active = act;
     }
 
     String getName(){
@@ -23,11 +23,11 @@ public class Contact {
     }
 
     String getNumber(){
-        return telefono;
+        return numberphone;
     }
 
-    int getActivo(){
-        return activo;
+    int getActive(){
+        return active;
     }
 
     void setName(String nm){
@@ -35,10 +35,10 @@ public class Contact {
     }
 
     void setNumber(String num){
-        telefono = num;
+        numberphone = num;
     }
 
-    void setActivo(int act){
-        activo = act;
+    void setActive(int act){
+        active = act;
     }
 }

@@ -70,7 +70,7 @@ public class Inicio extends AppCompatActivity {
         pbutton.pushButton(); // Creamos el botón de pánico en la Activity
 
         bleConnection = new BLEConnection(Inicio.this,this);
-        bleConnection.estaActivado();
+        bleConnection.isActivated();
 
         GPSTracker gps;
         gps = new GPSTracker(this);
@@ -108,7 +108,7 @@ public class Inicio extends AppCompatActivity {
                     bleConnection.stopScanBLEDevices();
                 }
 
-                bleConnection.sinPeligro();
+                bleConnection.withoutDanger();
                 bleConnection.startScanBLEDevices();
             }
         };
@@ -187,7 +187,7 @@ public class Inicio extends AppCompatActivity {
 
         // Activa el bluetooth
         if(id == R.id.bluetooth){
-            bleConnection.estaActivado();
+            bleConnection.isActivated();
         }
 
         // Sale pestaá para actualizar la info del usuario

@@ -41,15 +41,15 @@ public class ContactArrayAdapter extends ArrayAdapter<Contact> {
         LayoutInflater inflater = mActivity.getLayoutInflater();
         View item = inflater.inflate(R.layout.contact_arrayadapter, null);
 
-        TextView nombre = (TextView) item.findViewById(R.id.contacto_nombre);
-        nombre.setText(list.get(position).getName());
+        TextView name = (TextView) item.findViewById(R.id.contacto_nombre);
+        name.setText(list.get(position).getName());
 
-        ImageView imagen = (ImageView) item.findViewById(R.id.estado_contacto);
-        if(list.get(position).getActivo() == 1){
-            imagen.setImageResource(R.drawable.activo);
+        ImageView image = (ImageView) item.findViewById(R.id.estado_contacto);
+        if(list.get(position).getActive() == 1){
+            image.setImageResource(R.drawable.activo);
         }
-        else if(list.get(position).getActivo() == 0){
-            imagen.setImageResource(R.drawable.inactivo);
+        else if(list.get(position).getActive() == 0){
+            image.setImageResource(R.drawable.inactivo);
         }
 
         return item;

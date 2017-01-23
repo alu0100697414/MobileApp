@@ -32,10 +32,10 @@ public class Autentication extends AppCompatActivity {
             protectULLDB.insertarCONFIG_APP("1","123456");
         }
 
-        // Edittext de la contraseña
+        // EditText de la contraseña
         final EditText input = (EditText) findViewById(R.id.pass_toenter);
 
-        // Botón cuando accede con la contraseña
+        // Botón para confirmar la contraseña
         Button b = (Button) findViewById(R.id.button_acceso_app);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,11 +44,11 @@ public class Autentication extends AppCompatActivity {
                 InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
+                // Si introduce la contraseña correctamente puede acceder a la aplicación.
                 if(password.equals(input.getText().toString())){
                     input.setText("");
                     startActivity(new Intent(Autentication.this, Inicio.class));
-                }
-                else {
+                } else {
                     Snackbar.make(v, R.string.pass_incorrecta, Snackbar.LENGTH_LONG).show();
                 }
             }

@@ -51,20 +51,20 @@ public class KeysReader {
             e.printStackTrace();
         }
 
-        // removes the first and last lines of the file (comments)
+        // Elimina la primera y la última línea del fichero (comentarios)
         if (lines.size() > 1 && lines.get(0).startsWith("-----") && lines.get(lines.size()-1).startsWith("-----")) {
             lines.remove(0);
             lines.remove(lines.size()-1);
         }
 
-        // concats the remaining lines to a single String
+        // Concatena el resto de líneas en una sola
         StringBuilder sb = new StringBuilder();
         for (String aLine: lines)
             sb.append(aLine);
         String keyString = sb.toString();
         Log.i("ECDH", "Clave pública leida: " + keyString);
 
-        // converts the String to a PublicKey instance
+        // Convierte el String en una instancia de PublicKey
         byte[] keyBytes = Crypto.base64Decode(keyString);
         X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
         Log.i("ECDH", "keybytes: " + Crypto.hex(spec.getEncoded()));
@@ -98,20 +98,20 @@ public class KeysReader {
             e.printStackTrace();
         }
 
-        // removes the first and last lines of the file (comments)
+        // Elimina la primera y la última línea del fichero (comentarios)
         if (lines.size() > 1 && lines.get(0).startsWith("-----") && lines.get(lines.size()-1).startsWith("-----")) {
             lines.remove(0);
             lines.remove(lines.size()-1);
         }
 
-        // concats the remaining lines to a single String
+        // Concatena el resto de líneas en una sola
         StringBuilder sb = new StringBuilder();
         for (String aLine: lines)
             sb.append(aLine);
         String keyString = sb.toString();
         Log.i("ECDH", "Clave privada leida: " + keyString);
 
-        // converts the String to a PrivateKey instance
+        // Convierte el String en una instancia de PublicKey
         byte[] keyBytes = Crypto.base64Decode(keyString);
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
         Log.i("ECDH", "keybytes: " + Crypto.hex(spec.getEncoded()));
@@ -126,7 +126,7 @@ public class KeysReader {
         return key;
     }
 
-    public static String generarClaveCompartida(PrivateKey privada, PublicKey publica) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, InvalidKeyException {
+    public static String generateSharedKey(PrivateKey privada, PublicKey publica) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, InvalidKeyException {
         KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH", "SC");
         keyAgreement.init(privada);
         keyAgreement.doPhase(publica, true);

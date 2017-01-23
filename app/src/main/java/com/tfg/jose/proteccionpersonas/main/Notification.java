@@ -150,7 +150,7 @@ public class Notification {
 
         if(protectULLDB.recuperarCONTACTOS().size() != 0 && sms_enviado == 0){
             for (int i = 0; i < protectULLDB.recuperarCONTACTOS().size(); i++) {
-                if(protectULLDB.recuperarCONTACTOS().get(i).getActivo() == 1){
+                if(protectULLDB.recuperarCONTACTOS().get(i).getActive() == 1){
                     sms.sendMultipartTextMessage(protectULLDB.recuperarCONTACTOS().get(i).getNumber(), null, parts, null, null);
                 }
             }

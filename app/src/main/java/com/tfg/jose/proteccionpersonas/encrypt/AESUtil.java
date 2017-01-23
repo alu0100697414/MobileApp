@@ -41,7 +41,7 @@ public enum AESUtil {
         return decrypted;
     }
 
-    // Get spec
+    // Devuelve el spec
     static AlgorithmParameterSpec makeIv() {
         try {
             return new IvParameterSpec(ENCRYPTION_IV.getBytes("UTF-8"));

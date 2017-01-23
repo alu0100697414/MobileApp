@@ -26,7 +26,7 @@ public class ContactList extends AppCompatActivity {
     private int PICK_CONTACT_REQUEST;
 
     private ContactArrayAdapter adaptador;
-    private ArrayList<Contact> contactos;
+    private ArrayList<Contact> contacts;
     private ListView list;
 
     private DBase protectULLDB;
@@ -34,7 +34,7 @@ public class ContactList extends AppCompatActivity {
     // Contructor
     public ContactList(){
         this.PICK_CONTACT_REQUEST = 1;
-        this.contactos = new ArrayList<Contact>();
+        this.contacts = new ArrayList<Contact>();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ContactList extends AppCompatActivity {
         protectULLDB = new DBase(getApplicationContext());
 
         // Iniciamos el adaptador
-        this.adaptador = new ContactArrayAdapter(this, android.R.layout.simple_list_item_1, contactos);
+        this.adaptador = new ContactArrayAdapter(this, android.R.layout.simple_list_item_1, contacts);
 
         this.list = (ListView) findViewById(R.id.lista_contactos);
         list.setAdapter(adaptador);
@@ -120,10 +120,10 @@ public class ContactList extends AppCompatActivity {
                 Contact cont = (Contact) list.getItemAtPosition(position);
 
                 String estado_contacto = "";
-                if(cont.getActivo() == 1){
+                if(cont.getActive() == 1){
                     estado_contacto = getString(R.string.deshab_contacto);
                 }
-                else if(cont.getActivo() == 0){
+                else if(cont.getActive() == 0){
                     estado_contacto = getString(R.string.hab_contacto);
                 }
 
@@ -152,7 +152,7 @@ public class ContactList extends AppCompatActivity {
                                                     new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int whichButton) {
 
-                                                            protectULLDB.modificarCONTACTO(input2.getText().toString(), input1.getText().toString(), con.getActivo());
+                                                            protectULLDB.modificarCONTACTO(input2.getText().toString(), input1.getText().toString(), con.getActive());
                                                             mostrarContactos();
                                                         }
                                                     })
@@ -171,7 +171,7 @@ public class ContactList extends AppCompatActivity {
 
                                     Contact cont = (Contact) list.getItemAtPosition(position);
 
-                                    int estado = cont.getActivo();
+                                    int estado = cont.getActive();
 
                                     if(estado == 1) { estado = 0; }
                                     else if (estado == 0){ estado = 1; }
@@ -240,7 +240,7 @@ public class ContactList extends AppCompatActivity {
         if(protectULLDB.recuperarCONTACTOS().size() != 0){
 
             for (int i = 0; i < protectULLDB.recuperarCONTACTOS().size(); i++) {
-                adaptador.add(new Contact(protectULLDB.recuperarCONTACTOS().get(i).getName(), protectULLDB.recuperarCONTACTOS().get(i).getNumber(), protectULLDB.recuperarCONTACTOS().get(i).getActivo()));
+                adaptador.add(new Contact(protectULLDB.recuperarCONTACTOS().get(i).getName(), protectULLDB.recuperarCONTACTOS().get(i).getNumber(), protectULLDB.recuperarCONTACTOS().get(i).getActive()));
             }
 
             adaptador.notifyDataSetChanged();
