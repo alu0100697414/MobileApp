@@ -150,8 +150,6 @@ public class Inicio extends AppCompatActivity {
             data.put("number", getString(R.string.no_definido));
         }
 
-        gps = new GPSTracker(this);
-
         if (gps.canGetLocation() && gps != null){
             data.put("latitude", String.valueOf(gps.getLatitude()));
             data.put("longitude", String.valueOf(gps.getLongitude()));
@@ -159,9 +157,6 @@ public class Inicio extends AppCompatActivity {
             data.put("latitude", "null");
             data.put("longitude", "null");
         }
-
-        gps.stopUsingGPS();
-        gps.onDestroy();
 
         BatteryManager bm = (BatteryManager)getSystemService(BATTERY_SERVICE);
         int batLevel = 0;
