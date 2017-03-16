@@ -15,12 +15,53 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Jose Angel.
  */
 
 public class Request {
+
+    // Función que envía posición de la víctima como ping
+    public static void pingStatusDevice(Map<String, String> info, String server) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
+        // Generamos la clave secreta con la que cifrará posteriormente el AES
+        String key = KeysReader.generateSharedKey(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
+
+        // Ciframos los parametros que le enviamos al servidor web
+        String CName = AESUtil.encrypt(info.get("name"),key);
+        String CNumber = AESUtil.encrypt(info.get("number"),key);
+        String CLatitude = AESUtil.encrypt(info.get("latitude"),key);
+        String CLongitude = AESUtil.encrypt(info.get("longitude"),key);
+        String CBattery = AESUtil.encrypt(info.get("battery"),key);
+
+        // Creamos un hash con todas las variables que vamos a enviar
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("battery", CBattery);
+        params.put("name", CName);
+        params.put("number", CNumber);
+        params.put("latitude", CLatitude);
+        params.put("longitude", CLongitude);
+
+        // Creamos el JSON y lo añadimos a la cola
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, server + "/statusdevice/" + info.get("mac"), new JSONObject(params),
+                new com.android.volley.Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i("Volley Ping ", response.toString());
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.i("Volley Ping Error ", error.toString());
+                    }
+                });
+
+        Config.requestQueue.add(jsonObjectRequest);
+        Log.i("caca",server + "/statusdevice/" + info.get("mac"));
+
+    }
 
     //Función que registra a un usuario en el servicio web la primera vez que usa la app
     public static void newUser(String MAC, String short_url, String server_url) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {

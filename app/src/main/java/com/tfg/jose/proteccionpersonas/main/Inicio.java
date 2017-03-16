@@ -1,11 +1,9 @@
 package com.tfg.jose.proteccionpersonas.main;
 
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
@@ -20,12 +18,21 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.Volley;
 import com.tfg.jose.proteccionpersonas.R;
 import com.tfg.jose.proteccionpersonas.gps.GPSTracker;
+import com.tfg.jose.proteccionpersonas.webservices.Config;
+import com.tfg.jose.proteccionpersonas.webservices.Request;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +43,7 @@ public class Inicio extends AppCompatActivity {
     private Notification mNotification;
     private DBase protectULLDB;
     private BLEConnection bleConnection;
+    private GPSTracker gps;
 
     ScheduledExecutorService executor;
 
@@ -65,12 +73,13 @@ public class Inicio extends AppCompatActivity {
         // Inicializamos la base de datos
         protectULLDB = new DBase(getApplicationContext());
 
+        Config.requestQueue = Volley.newRequestQueue(this);
+
         pbutton.pushButton(); // Creamos el botón de pánico en la Activity
 
         bleConnection = new BLEConnection(Inicio.this,this);
         bleConnection.isActivated();
 
-        GPSTracker gps;
         gps = new GPSTracker(this);
 
         if (!gps.canGetLocation()){
@@ -95,11 +104,9 @@ public class Inicio extends AppCompatActivity {
             bt_dialog.show();
         }
 
-        gps.stopUsingGPS();
-        gps.onDestroy();
 
         // Ejecutamos el servicio de busqueda de dispositivos bluetooth cada x tiempo
-        Runnable searchB = new Runnable() {
+        Runnable searchBleDevice = new Runnable() {
             public void run() {
                 if(bleConnection.isDiscovering()){
                     bleConnection.stopScanBLEDevices();
@@ -107,12 +114,68 @@ public class Inicio extends AppCompatActivity {
 
                 bleConnection.withoutDanger();
                 bleConnection.startScanBLEDevices();
+
+                try {
+                    sendPingToServer();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (InvalidKeyException e) {
+                    e.printStackTrace();
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                } catch (NoSuchProviderException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         };
 
-        executor.scheduleAtFixedRate(searchB, 0, 10, TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(searchBleDevice, 0, 15, TimeUnit.SECONDS);
     }
 
+    public void sendPingToServer() throws ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+        Map<String, String> data = new HashMap<String, String>();;
+
+        data.put("mac", BackgroundVideoRecorder.getWifiMacAddress());
+
+        List<Contact> contacto;
+        contacto = protectULLDB.recuperarINFO_USUARIO();
+
+        if(!contacto.isEmpty()){
+            data.put("name", contacto.get(0).getName());
+            data.put("number", contacto.get(0).getNumber());
+        } else {
+            data.put("name", getString(R.string.no_definido));
+            data.put("number", getString(R.string.no_definido));
+        }
+
+        gps = new GPSTracker(this);
+
+        if (gps.canGetLocation() && gps != null){
+            data.put("latitude", String.valueOf(gps.getLatitude()));
+            data.put("longitude", String.valueOf(gps.getLongitude()));
+        } else {
+            data.put("latitude", "null");
+            data.put("longitude", "null");
+        }
+
+        gps.stopUsingGPS();
+        gps.onDestroy();
+
+        BatteryManager bm = (BatteryManager)getSystemService(BATTERY_SERVICE);
+        int batLevel = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+        }
+
+        data.put("battery", String.valueOf(batLevel));
+
+        List<String> info_server = new ArrayList<String>();
+        info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+        Request.pingStatusDevice(data, info_server.get(0));
+    }
 
     // Si se pulsa el botón de atrás, sigue ejecutándose la app
     @Override
@@ -205,25 +268,26 @@ public class Inicio extends AppCompatActivity {
             }
 
             final AlertDialog.Builder alert = new AlertDialog.Builder(Inicio.this);
-                    alert.setTitle(getString(R.string.update_title))
-                         .setMessage(getString(R.string.update_text))
-                         .setView(textEntryView)
-                         .setPositiveButton(getString(R.string.actualizar),
-                                 new DialogInterface.OnClickListener() {
-                                     public void onClick(DialogInterface dialog, int whichButton) {
-                                         if (!contactoF.isEmpty()) {
-                                             protectULLDB.modificarINFO_USUARIO(input2.getText().toString(), input1.getText().toString());
-                                         } else {
-                                             protectULLDB.insertarINFO_USUARIO(input2.getText().toString(), input1.getText().toString());
-                                         }
+            alert.setTitle(getString(R.string.update_title))
+                 .setMessage(getString(R.string.update_text))
+                 .setView(textEntryView)
+                 .setPositiveButton(getString(R.string.actualizar),
+                         new DialogInterface.OnClickListener() {
+                             public void onClick(DialogInterface dialog, int whichButton) {
+                                 if (!contactoF.isEmpty()) {
+                                     protectULLDB.modificarINFO_USUARIO(input2.getText().toString(), input1.getText().toString());
+                                 } else {
+                                     protectULLDB.insertarINFO_USUARIO(input2.getText().toString(), input1.getText().toString());
+                                 }
 
-                                         Snackbar.make(getWindow().getDecorView().getRootView(), getString(R.string.datos_actualizados), Snackbar.LENGTH_LONG).show();
-                                     }
-                                 })
-                            .setNegativeButton(getString(R.string.cancelar),
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int whichButton) {}
-                         });
+                                 Snackbar.make(getWindow().getDecorView().getRootView(), getString(R.string.datos_actualizados), Snackbar.LENGTH_LONG).show();
+                             }
+                         })
+                    .setNegativeButton(getString(R.string.cancelar),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {}
+                 }
+            );
             alert.show();
         }
 
