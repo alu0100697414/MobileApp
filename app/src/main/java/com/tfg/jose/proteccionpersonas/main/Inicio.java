@@ -1,8 +1,11 @@
 package com.tfg.jose.proteccionpersonas.main;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -70,6 +73,10 @@ public class Inicio extends AppCompatActivity {
 
         toolbar.setLogo(R.mipmap.ic_launcher);
 
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SHUTDOWN);
+        BroadcastReceiver mReceiver = new ShutDownReceiver();
+        registerReceiver(mReceiver, filter);
+
         // Inicializamos la base de datos
         protectULLDB = new DBase(getApplicationContext());
 
@@ -115,19 +122,13 @@ public class Inicio extends AppCompatActivity {
                 bleConnection.withoutDanger();
                 bleConnection.startScanBLEDevices();
 
-                try {
-                    sendPingToServer();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (InvalidKeyException e) {
-                    e.printStackTrace();
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                } catch (NoSuchProviderException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                try { sendPingToServer(); }
+
+                catch (ClassNotFoundException e) { e.printStackTrace(); }
+                catch (InvalidKeyException e) { e.printStackTrace(); }
+                catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                catch (NoSuchProviderException e) { e.printStackTrace(); }
+                catch (IOException e) { e.printStackTrace(); }
             }
         };
 
@@ -417,4 +418,42 @@ public class Inicio extends AppCompatActivity {
             executor.shutdown();
         }
     }
+
+
+    public class ShutDownReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_SHUTDOWN)) {
+                Map<String, String> data = new HashMap<String, String>();
+
+                data.put("mac", BackgroundVideoRecorder.getWifiMacAddress());
+
+                List<Contact> contacto;
+                contacto = protectULLDB.recuperarINFO_USUARIO();
+
+                if(!contacto.isEmpty()){
+                    data.put("name", contacto.get(0).getName());
+                    data.put("number", contacto.get(0).getNumber());
+                } else {
+                    data.put("name", getString(R.string.no_definido));
+                    data.put("number", getString(R.string.no_definido));
+                }
+
+                data.put("type_incidence", "0");
+                data.put("text_incidence", "El móvil se ha apagado");
+
+                List<String> info_server = new ArrayList<String>();
+                info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+                try { Request.sendIncidence(data, info_server.get(0)); }
+
+                catch (IOException e) { e.printStackTrace(); }
+                catch (ClassNotFoundException e) { e.printStackTrace(); }
+                catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                catch (NoSuchProviderException e) { e.printStackTrace(); }
+                catch (InvalidKeyException e) { e.printStackTrace(); }
+            }
+        }
+    }
+
 }
