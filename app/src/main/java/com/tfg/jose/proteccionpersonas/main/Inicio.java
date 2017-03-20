@@ -369,6 +369,37 @@ public class Inicio extends AppCompatActivity {
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                         public void onClick(DialogInterface arg0, int arg1) {
+                            // Enviamos incidencia al servidor
+                            Map<String, String> data = new HashMap<String, String>();
+
+                            data.put("mac", BackgroundVideoRecorder.getWifiMacAddress());
+
+                            List<Contact> contacto;
+                            contacto = protectULLDB.recuperarINFO_USUARIO();
+
+                            if(!contacto.isEmpty()){
+                                data.put("name", contacto.get(0).getName());
+                                data.put("number", contacto.get(0).getNumber());
+                            } else {
+                                data.put("name", getString(R.string.no_definido));
+                                data.put("number", getString(R.string.no_definido));
+                            }
+
+                            data.put("type_incidence", "1");
+                            data.put("text_incidence", "Se ha cerrado la app");
+
+                            List<String> info_server = new ArrayList<String>();
+                            info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+                            try { Request.sendIncidence(data, info_server.get(0)); }
+
+                            catch (IOException e) { e.printStackTrace(); }
+                            catch (ClassNotFoundException e) { e.printStackTrace(); }
+                            catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                            catch (NoSuchProviderException e) { e.printStackTrace(); }
+                            catch (InvalidKeyException e) { e.printStackTrace(); }
+
+                            // Cerramos aplicación
                             Intent intent = new Intent(Intent.ACTION_MAIN);
                             intent.addCategory(Intent.CATEGORY_HOME);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

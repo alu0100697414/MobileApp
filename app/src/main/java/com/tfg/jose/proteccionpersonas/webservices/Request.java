@@ -28,26 +28,12 @@ public class Request {
         // Generamos la clave secreta con la que cifrará posteriormente el AES
         String key = KeysReader.generateSharedKey(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
 
-        // Cogemos la fecha y hora actuales
-        Time now = new Time(Time.getCurrentTimezone());
-        now.setToNow();
-
-        String minute;
-        String hour;
-
-        int min = now.minute; if(min < 10){minute = "0" + String.valueOf(min);} else { minute = String.valueOf(min); }
-        int hou = now.hour; if(hou < 10){hour = "0" + String.valueOf(hou);} else { hour = String.valueOf(hou); }
-
-        String fecha = now.monthDay + "/" + (now.month+1) + "/" + now.year + " - " + hour + ":" + minute;
-
-
         // Ciframos los parametros que le enviamos al servidor web
         String CName = AESUtil.encrypt(info.get("name"),key);
         String CNumber = AESUtil.encrypt(info.get("number"),key);
         String CLatitude = AESUtil.encrypt(info.get("latitude"),key);
         String CLongitude = AESUtil.encrypt(info.get("longitude"),key);
         String CBattery = AESUtil.encrypt(info.get("battery"),key);
-        String CDate = AESUtil.encrypt(fecha,key);
 
         // Creamos un hash con todas las variables que vamos a enviar
         HashMap<String, String> params = new HashMap<String, String>();
@@ -56,7 +42,6 @@ public class Request {
         params.put("number", CNumber);
         params.put("latitude", CLatitude);
         params.put("longitude", CLongitude);
-        params.put("date", CDate);
 
         // Creamos el JSON y lo añadimos a la cola
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, server + "/statusdevice/" + info.get("mac"), new JSONObject(params),
@@ -210,6 +195,7 @@ public class Request {
 
     /**
      * Envía las incidencias que se puedan producir al servidor
+     *
      * @param info
      * @param server
      *
@@ -222,24 +208,11 @@ public class Request {
         // Generamos la clave secreta con la que cifrará posteriormente el AES
         String key = KeysReader.generateSharedKey(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
 
-        // Cogemos la fecha actual
-        Time now = new Time(Time.getCurrentTimezone());
-        now.setToNow();
-
-        String minute;
-        String hour;
-
-        int min = now.minute; if(min < 10){minute = "0" + String.valueOf(min);} else { minute = String.valueOf(min); }
-        int hou = now.hour; if(hou < 10){hour = "0" + String.valueOf(hou);} else { hour = String.valueOf(hou); }
-
-        String fecha = now.monthDay + "/" + (now.month+1) + "/" + now.year + " - " + hour + ":" + minute;
-
         // Ciframos los parametros que le enviamos al servidor web
         String CName = AESUtil.encrypt(info.get("name"),key);
         String CNumber = AESUtil.encrypt(info.get("number"),key);
         String CTypeIncidence = AESUtil.encrypt(info.get("type_incidence"),key);
         String CTextIncidence = AESUtil.encrypt(info.get("text_incidence"),key);
-        String CDate = AESUtil.encrypt(fecha,key);
 
         // Creamos un hash con todas las variables que vamos a enviar
         HashMap<String, String> params = new HashMap<String, String>();
@@ -247,7 +220,6 @@ public class Request {
         params.put("number", CNumber);
         params.put("type_incidence", CTypeIncidence);
         params.put("text_incidence", CTextIncidence);
-        params.put("date", CDate);
 
         // Creamos el JSON y lo añadimos a la cola
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, server + "/newincidence/" + info.get("mac"), new JSONObject(params),
