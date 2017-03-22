@@ -1,13 +1,21 @@
 package com.tfg.jose.proteccionpersonas.webservices;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.text.format.Time;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.tfg.jose.proteccionpersonas.R;
 import com.tfg.jose.proteccionpersonas.encrypt.AESUtil;
 import com.tfg.jose.proteccionpersonas.encrypt.KeysReader;
+import com.tfg.jose.proteccionpersonas.main.Inicio;
+import com.tfg.jose.proteccionpersonas.main.Notification;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -24,7 +32,7 @@ import java.util.Map;
 public class Request {
 
     // Función que envía posición de la víctima como ping
-    public static void pingStatusDevice(Map<String, String> info, String server) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
+    public static void pingStatusDevice(Map<String, String> info, String server, final Activity mActivity, final Context mContext) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         // Generamos la clave secreta con la que cifrará posteriormente el AES
         String key = KeysReader.generateSharedKey(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
 
@@ -48,7 +56,41 @@ public class Request {
                 new com.android.volley.Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i("Volley Ping ", response.toString());
+
+                        double distance = -1;
+
+                        try { distance = Double.parseDouble(response.get("distancia").toString()); }
+                        catch (JSONException e) { e.printStackTrace(); }
+
+                        TextView rssi_msg = (TextView) mActivity.findViewById(R.id.res_busqueda);
+                        TextView res_dist = (TextView) mActivity.findViewById(R.id.res_distancia);
+                        TextView rssi_dist = (TextView) mActivity.findViewById(R.id.res_distancia);
+
+                        Notification mNotification = new Notification(mContext, mActivity);
+
+                        // Actualizamos la información dependiendo de la distancia a la que se encuentre el agresor
+                        if(distance < 1 && distance > 0.5){ // WARNING
+                            rssi_msg.setText(mActivity.getString(R.string.aviso) + "\n" + mActivity.getString(R.string.mensaje_aviso));
+                            res_dist.setText((int) (distance*1000) + "m");
+
+                            mNotification.notificar_radio();
+                        } else if(distance <= 0.5 && distance > 0.1){ // DANGER
+                            rssi_msg.setText(mContext.getString(R.string.peligro) + "\n" + mContext.getString(R.string.mensaje_peligro));
+                            res_dist.setText((int) (distance*1000) + "m");
+
+                            // Notificamos a la víctima
+                            mNotification.notificar_limite();
+
+                            // Notificamos a los contactos
+                            mNotification.enviar_sms();
+                            mNotification.setSms_enviado(1);
+                        } else if(distance == -1){ // ERROR
+                            rssi_msg.setText(mContext.getString(R.string.error_distancia));
+                            rssi_dist.setText("");
+                        } else { // NO DANGER
+                            rssi_msg.setText(mContext.getString(R.string.sin_peligro));
+                            rssi_dist.setText("");
+                        }
                     }
                 },
                 new com.android.volley.Response.ErrorListener() {
@@ -203,6 +245,9 @@ public class Request {
      *      0 -> El móvil se va a apagar
      *      1 -> El usuario cierra la aplicación
      *      2 -> Hace tiempo que no envía ping al servidor
+     *      3 -> El agresor está por debajo de 1 km de distania de la víctima
+     *      4 -> El usuario no activa GPS
+     *      5 .> El usuario no activa BLE
      */
     public static void sendIncidence(Map<String, String> info, String server) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         // Generamos la clave secreta con la que cifrará posteriormente el AES

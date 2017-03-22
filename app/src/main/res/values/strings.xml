@@ -33,6 +33,8 @@
     <string name="mensaje_aviso">Fuera de la distancia de peligro.</string>
     <string name="sin_peligro">NO HAY PELIGRO.</string>
     <string name="b_desactivado">Bluetooth desactivado.</string>
+    <string name="gps_desactivado">GPS desactivado.</string>
+    <string name="error_distancia">Problema al calcular distancias. Tenga el Bluetooth activado por su seguridad.</string>
 
     <string name="add_contacto">Añadir contacto</string>
     <string name="add_contacto_msg">Añada un contacto a su lista de avisos.</string>

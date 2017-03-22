@@ -38,7 +38,6 @@ public class BLEConnection {
     private double px;  // Valor de intensidad de señal entre dos dispositivos a un metro de distancia.
 
     private final static int REQUEST_ENABLE_BT = 1;
-    private int limitDistance;
 
     private BluetoothManager btManager;
     private BluetoothAdapter btAdapter;
@@ -55,7 +54,6 @@ public class BLEConnection {
 
         this.deviceFound = false;
         this.px = -54;
-        this.limitDistance = 30;
 
         btAdapter.startLeScan(leScanCallback);
     }
@@ -91,7 +89,7 @@ public class BLEConnection {
         return Math.pow(10d, ((double) txPower - rssi) / (10 * 2.7));
     }
 
-    boolean isMyServiceRunning(Class<?> serviceClass) {
+    public boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
@@ -116,7 +114,7 @@ public class BLEConnection {
 
                 mActivity.invalidateOptionsMenu(); // Refrescamos el menu
 
-                if (deviceFound == false && btAdapter.isEnabled()) {
+                /*if (deviceFound == false && btAdapter.isEnabled()) {
                     btAdapter.stopLeScan(leScanCallback);
 
                     // Acutlizamos a 0 para si vuelve a encotnrar al agresor
@@ -125,11 +123,12 @@ public class BLEConnection {
                     rssi_msg.setText(mContext.getString(R.string.sin_peligro));
                     rssi_dist.setText("");
 
-                } else if (deviceFound == false && !btAdapter.isEnabled()) {
+                } else */
+                if (deviceFound == false && !btAdapter.isEnabled()) {
                     btAdapter.stopLeScan(leScanCallback);
 
-                    rssi_msg.setText(mContext.getString(R.string.b_desactivado));
-                    rssi_dist.setText("");
+//                    rssi_msg.setText(mContext.getString(R.string.b_desactivado));
+//                    rssi_dist.setText("");
 
                     mNotification.bluetooth_desactivado();
                 } else {
@@ -163,41 +162,31 @@ public class BLEConnection {
                 TextView res_dist = (TextView) mActivity.findViewById(R.id.res_distancia);
 
                 // Si el agresor supera la distancia límite
-                if(distance < limitDistance){
+                rssi_msg.setText("URGENTE" + "\n" + "El agresor está muy próximo a usted");
+                res_dist.setText(rdistance + "m");
 
-                    rssi_msg.setText(mContext.getString(R.string.peligro) + "\n" + mContext.getString(R.string.mensaje_peligro));
-                    res_dist.setText(rdistance + "m");
+                // Notificamos a la víctima
+                mNotification.notificar_limite();
 
-                    // Notificamos a la víctima
-                    mNotification.notificar_limite();
+                // Notificamos a los contactos
+                mNotification.enviar_sms();
+                mNotification.setSms_enviado(1);
 
-                    // Notificamos a los contactos
-                    mNotification.enviar_sms();
-                    mNotification.setSms_enviado(1);
-
-                    // Abrimos aplicación si está en segundo plano
-                    if(mActivity.hasWindowFocus() == false) {
-                        Intent intento = new Intent(mContext, Inicio.class);
-                        intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                        mContext.startActivity(intento);
-                    }
-
-                    // Comenzamos el vídeo streaming automáticamente
-                    if(isMyServiceRunning(BackgroundVideoRecorder.class) == false){
-                        mContext.startService(new Intent(mContext, BackgroundVideoRecorder.class));
-                    }
-
-                    TextView recording = (TextView) mActivity.findViewById(R.id.grabando);
-                    recording.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
-                    recording.setVisibility(View.VISIBLE);
-                } else {
-                    // Si lo encuentra pero no la supera, se le dice
-                    rssi_msg.setText(mContext.getString(R.string.mensaje_aviso));
-                    res_dist.setText(rdistance + "m");
-
-                    // Notificación de que se encuentra por los alrededores
-                    mNotification.notificar_radio();
+                // Abrimos aplicación si está en segundo plano
+                if(mActivity.hasWindowFocus() == false) {
+                    Intent intento = new Intent(mContext, Inicio.class);
+                    intento.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    mContext.startActivity(intento);
                 }
+
+                // Comenzamos el vídeo streaming automáticamente
+                if(isMyServiceRunning(BackgroundVideoRecorder.class) == false){
+                    mContext.startService(new Intent(mContext, BackgroundVideoRecorder.class));
+                }
+
+                TextView recording = (TextView) mActivity.findViewById(R.id.grabando);
+                recording.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
+                recording.setVisibility(View.VISIBLE);
 
                 mActivity.invalidateOptionsMenu(); // Refrescamos el menú
             }

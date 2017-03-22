@@ -63,4 +63,6 @@
     <string name="update_pass_text">Make sure your password is regularly updated to avoid compromising your application.</string>
     <string name="update_text">For security reasons, keep your contact information up to date.</string>
     <string name="action_server">Change server</string>
+    <string name="gps_desactivado">GPS has been disabled</string>
+    <string name="error_distancia">Problem when calculating distances. Have Bluetooth enabled for your safety.</string>
 </resources>

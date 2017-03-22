@@ -37,7 +37,7 @@ public class Notification {
         this.sms_enviado = 0;
     }
 
-    // Notificación cuando es detectado pero no sobreapasa el radio.
+    // Notificación cuando la vítima tiene el bluetooth desactivado
     public void bluetooth_desactivado(){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
 
@@ -54,6 +54,28 @@ public class Notification {
 
         String texto = mContext.getString(R.string.msg_b_desactivado_1) + " " + mContext.getString(R.string.msg_b_desactivado_2);
         builder.setStyle(new NotificationCompat.BigTextStyle().bigText(texto));
+
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        builder.setSound(alarmSound);
+
+        NotificationManager notificationManager = (NotificationManager) mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(1, builder.build());
+    }
+
+    // Notificación cuando la vítima tiene el GPS desactivado
+    public void gps_desactivado(){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+
+        Intent intent = new Intent(mContext, Inicio.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
+
+        builder.setContentIntent(pendingIntent);
+        builder.setSmallIcon(R.drawable.notification);
+        builder.setAutoCancel(true);
+        builder.setOngoing(true);
+        builder.setContentTitle(mContext.getString(R.string.aviso));
+        builder.setContentText(mContext.getString(R.string.gps_desactivado));
 
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         builder.setSound(alarmSound);
