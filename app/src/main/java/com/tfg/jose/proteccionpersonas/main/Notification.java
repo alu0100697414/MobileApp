@@ -84,6 +84,27 @@ public class Notification {
         notificationManager.notify(1, builder.build());
     }
 
+    // Notificación cuando la vítima tiene el GPS desactivado
+    public void gps_error(){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+
+        Intent intent = new Intent(mContext, Inicio.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
+
+        builder.setContentIntent(pendingIntent);
+        builder.setSmallIcon(R.drawable.notification);
+        builder.setAutoCancel(true);
+        builder.setContentTitle(mContext.getString(R.string.aviso));
+        builder.setContentText(mContext.getString(R.string.gps_error));
+
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        builder.setSound(alarmSound);
+
+        NotificationManager notificationManager = (NotificationManager) mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(1, builder.build());
+    }
+
     // Notificación cuando es detectado pero no sobreapasa el radio.
     public void notificar_radio(){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);

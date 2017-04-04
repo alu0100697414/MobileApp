@@ -105,7 +105,7 @@ public class Inicio extends AppCompatActivity {
             bt_dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-
+                    mNotification.gps_desactivado();
                 }
             });
             bt_dialog.show();
@@ -151,12 +151,17 @@ public class Inicio extends AppCompatActivity {
             data.put("number", getString(R.string.no_definido));
         }
 
+        gps = new GPSTracker(this);
+
         if (gps.canGetLocation() && gps != null){
-            data.put("latitude", String.valueOf(gps.getLatitude()));
-            data.put("longitude", String.valueOf(gps.getLongitude()));
+            data.put("latitude", String.valueOf(gps.getLocation().getLatitude()));
+            Log.d("caca", String.valueOf(gps.getLocation().getLatitude()));
+            Log.d("caca", String.valueOf(gps.getLocation().getLongitude()));
+            data.put("longitude", String.valueOf(gps.getLocation().getLongitude()));
         } else {
             data.put("latitude", "null");
             data.put("longitude", "null");
+            mNotification.gps_error();
         }
 
         BatteryManager bm = (BatteryManager)getSystemService(BATTERY_SERVICE);
