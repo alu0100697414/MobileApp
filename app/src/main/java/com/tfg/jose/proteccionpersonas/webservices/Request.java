@@ -246,8 +246,6 @@ public class Request {
      *      1 -> El usuario cierra la aplicación
      *      2 -> Hace tiempo que no envía ping al servidor
      *      3 -> El agresor está por debajo de 1 km de distania de la víctima
-     *      4 -> El usuario no activa GPS
-     *      5 .> El usuario no activa BLE
      */
     public static void sendIncidence(Map<String, String> info, String server) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         // Generamos la clave secreta con la que cifrará posteriormente el AES

@@ -348,12 +348,17 @@ public class Inicio extends AppCompatActivity {
             final View vista = this.findViewById(android.R.id.content);
 
             final AlertDialog.Builder alert = new AlertDialog.Builder(Inicio.this);
+            final List<String> finalInfo_server = info_server;
             alert.setTitle("Configurar acceso servidor")
                     .setView(textEntryView)
                     .setPositiveButton(getString(R.string.actualizar),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    protectULLDB.modificarINFO_SERVER("1",url_servidor.getText().toString(),url_streaming.getText().toString(),user_server.getText().toString(),pass_server.getText().toString(),short_streaming_url.getText().toString());
+                                    if(!finalInfo_server.isEmpty()) {
+                                        protectULLDB.modificarINFO_SERVER("1", url_servidor.getText().toString(), url_streaming.getText().toString(), user_server.getText().toString(), pass_server.getText().toString(), short_streaming_url.getText().toString());
+                                    } else {
+                                        protectULLDB.insertarINFO_SERVER("1", url_servidor.getText().toString(), url_streaming.getText().toString(), user_server.getText().toString(), pass_server.getText().toString(), short_streaming_url.getText().toString());
+                                    }
                                     Snackbar.make(vista, "Información del servidor actualizada.", Snackbar.LENGTH_LONG).show();
                                 }
                             })
