@@ -176,6 +176,8 @@ public class Inicio extends AppCompatActivity {
         info_server = protectULLDB.recuperarINFO_SERVER("1");
 
         Request.pingStatusDevice(data, info_server.get(0), this, getApplicationContext());
+
+        Log.i("DATOS", info_server.get(0));
     }
 
     // Si se pulsa el botón de atrás, sigue ejecutándose la app

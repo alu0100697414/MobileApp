@@ -146,7 +146,8 @@ public class BLEConnection {
             Log.i("FIND_D", "Encontrado: " + device.getName());
             Log.i("FIND_D", "Encontrado: " + device.getAddress());
 
-            if(device.getAddress().equals("F4:BE:76:06:43:75")){
+            // F4:BE:76:06:43:75
+            if(device.getAddress().equals("E2:E4:41:30:C2:64")){
                 btAdapter.stopLeScan(leScanCallback);
 
                 // Calculamos la distancia aproximada
@@ -169,8 +170,10 @@ public class BLEConnection {
                 mNotification.notificar_limite();
 
                 // Notificamos a los contactos
-                mNotification.enviar_sms();
-                mNotification.setSms_enviado(1);
+                // Mirar error al enviar sms
+                // (https://stackoverflow.com/questions/32742327/neither-user-10102-nor-current-process-has-android-permission-read-phone-state)
+//                mNotification.enviar_sms();
+//                mNotification.setSms_enviado(1);
 
                 // Abrimos aplicación si está en segundo plano
                 if(mActivity.hasWindowFocus() == false) {

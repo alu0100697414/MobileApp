@@ -28,7 +28,7 @@ public class PanicButton {
     public PanicButton(Context context, Activity activity){
         this.mContext = context;
         this.mActivity = activity;
-        this.telefono = "tel:689316443";
+        this.telefono = "tel:999999999";
     }
 
     // Función para poner el botón de pánico

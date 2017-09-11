@@ -51,6 +51,8 @@ public class Request {
         params.put("latitude", CLatitude);
         params.put("longitude", CLongitude);
 
+        Log.i("LOG_TEST", "Llamada");
+
         // Creamos el JSON y lo añadimos a la cola
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, server + "/statusdevice/" + info.get("mac"), new JSONObject(params),
                 new com.android.volley.Response.Listener<JSONObject>() {
@@ -77,6 +79,9 @@ public class Request {
                         } else if(distance <= 0.5 && distance > 0.1){ // DANGER
                             rssi_msg.setText(mContext.getString(R.string.peligro) + "\n" + mContext.getString(R.string.mensaje_peligro));
                             res_dist.setText((int) (distance*1000) + "m");
+
+//                            rssi_msg.setText("URGENTE" + "\n" + "El agresor ha sido detectado por Bluetooth y está muy próximo a usted");
+//                            res_dist.setText("80m");
 
                             // Notificamos a la víctima
                             mNotification.notificar_limite();
