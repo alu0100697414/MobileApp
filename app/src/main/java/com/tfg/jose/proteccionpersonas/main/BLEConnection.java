@@ -152,6 +152,7 @@ public class BLEConnection {
 
                 // Calculamos la distancia aproximada
                 double distance = getDistance(rssi, px);
+                Log.i("BLE_DIST", String.valueOf(distance) + " metros.");
 
                 deviceFound = true; // Encontró el dispositivo
 
