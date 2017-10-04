@@ -76,7 +76,7 @@ public class Request {
                             res_dist.setText((int) (distance*1000) + "m");
 
                             mNotification.notificar_radio();
-                        } else if(distance <= 0.5 && distance > 0.1){ // DANGER
+                        } else if(distance <= 0.5 && distance >= 0){ // DANGER
                             rssi_msg.setText(mContext.getString(R.string.peligro) + "\n" + mContext.getString(R.string.mensaje_peligro));
                             res_dist.setText((int) (distance*1000) + "m");
 
