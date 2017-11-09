@@ -106,6 +106,36 @@ public class Inicio extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     mNotification.gps_desactivado();
+
+                    // Enviamos incidencia al servidor
+                    Map<String, String> data = new HashMap<String, String>();
+
+                    data.put("mac", BackgroundVideoRecorder.getWifiMacAddress());
+
+                    List<Contact> contacto;
+                    contacto = protectULLDB.recuperarINFO_USUARIO();
+
+                    if(!contacto.isEmpty()){
+                        data.put("name", contacto.get(0).getName());
+                        data.put("number", contacto.get(0).getNumber());
+                    } else {
+                        data.put("name", getString(R.string.no_definido));
+                        data.put("number", getString(R.string.no_definido));
+                    }
+
+                    data.put("type_incidence", "4");
+                    data.put("text_incidence", "GPS de la víctima desactivado.");
+
+                    List<String> info_server = new ArrayList<String>();
+                    info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+                    try { Request.sendIncidence(data, info_server.get(0)); }
+
+                    catch (IOException e) { e.printStackTrace(); }
+                    catch (ClassNotFoundException e) { e.printStackTrace(); }
+                    catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                    catch (NoSuchProviderException e) { e.printStackTrace(); }
+                    catch (InvalidKeyException e) { e.printStackTrace(); }
                 }
             });
             bt_dialog.show();
