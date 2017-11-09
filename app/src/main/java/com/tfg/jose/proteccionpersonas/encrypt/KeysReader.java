@@ -4,7 +4,9 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import com.tfg.jose.proteccionpersonas.R;
 import com.tfg.jose.proteccionpersonas.encrypt.Crypto;
+import com.tfg.jose.proteccionpersonas.main.ApplicationContext;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -196,7 +198,7 @@ public class KeysReader {
     }
 
     public static PublicKey getPubKeyServer() throws IOException, ClassNotFoundException {
-        FileInputStream fis = new FileInputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/serverpub.ser");
+        InputStream fis = ApplicationContext.getContext().getResources().openRawResource(R.raw.serverpub);
         ObjectInputStream ois = new ObjectInputStream(fis);
         PublicKey key = (PublicKey) ois.readObject();
         ois.close();
@@ -205,7 +207,7 @@ public class KeysReader {
     }
 
     public static PrivateKey getPrivKeyClient() throws IOException, ClassNotFoundException {
-        FileInputStream fis = new FileInputStream(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cert/clientpri.ser");
+        InputStream fis = ApplicationContext.getContext().getResources().openRawResource(R.raw.clientpri);
         ObjectInputStream ois = new ObjectInputStream(fis);
         PrivateKey key = (PrivateKey) ois.readObject();
         ois.close();
