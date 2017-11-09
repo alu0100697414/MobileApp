@@ -87,8 +87,8 @@ public class Request {
                             mNotification.notificar_limite();
 
                             // Notificamos a los contactos
-                            mNotification.enviar_sms();
-                            mNotification.setSms_enviado(1);
+//                            mNotification.enviar_sms();
+//                            mNotification.setSms_enviado(1);
                         } else if(distance == -1){ // ERROR
                             rssi_msg.setText(mContext.getString(R.string.error_distancia));
                             rssi_dist.setText("");

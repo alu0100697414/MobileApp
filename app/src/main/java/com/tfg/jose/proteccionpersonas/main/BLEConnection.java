@@ -147,7 +147,7 @@ public class BLEConnection {
             Log.i("FIND_D", "Encontrado: " + device.getAddress());
 
             // F4:BE:76:06:43:75
-            if(device.getAddress().equals("E2:E4:41:30:C2:64")){
+            if(device.getAddress().equals("40:4E:36:04:CE:BC")){
                 btAdapter.stopLeScan(leScanCallback);
 
                 // Calculamos la distancia aproximada
@@ -164,7 +164,7 @@ public class BLEConnection {
                 TextView res_dist = (TextView) mActivity.findViewById(R.id.res_distancia);
 
                 // Si el agresor supera la distancia límite
-                rssi_msg.setText("URGENTE" + "\n" + "El agresor está muy próximo a usted");
+                rssi_msg.setText("URGENTE" + "\n" + "El agresor está muy próximo a usted.");
                 res_dist.setText(rdistance + "m");
 
                 // Notificamos a la víctima

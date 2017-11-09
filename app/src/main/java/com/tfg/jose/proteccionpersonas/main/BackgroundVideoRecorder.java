@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.Volley;
 import com.tfg.jose.proteccionpersonas.R;
@@ -210,33 +211,40 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
     }
 
     private void initRtspClient() {
-        // Configures the SessionBuilder
-        mSession = SessionBuilder.getInstance()
-                .setContext(getApplicationContext())
-                .setAudioEncoder(SessionBuilder.AUDIO_AAC)
-                .setAudioQuality(new AudioQuality(8000, 16000))
-                .setVideoEncoder(SessionBuilder.VIDEO_H264)
-                .setSurfaceView(surfaceView)
-                .setCallback(this).build();
-
-        // Configures the RTSP client
-        mClient = new RtspClient();
-        mClient.setSession(mSession);
-        mClient.setCallback(this);
-
-        String ip, port, path;
 
         // We parse the URI written in the Editext
-        Pattern uri = Pattern.compile("rtsp://(.+):(\\d+)/(.+)");
-        Matcher m = uri.matcher(info_server.get(1).toString() + macAddress);
-        m.find();
-        ip = m.group(1);
-        port = m.group(2);
-        path = m.group(3);
+        String ip, port, path;
 
-        mClient.setCredentials(info_server.get(2).toString(), info_server.get(3).toString());
-        mClient.setServerAddress(ip, Integer.parseInt(port));
-        mClient.setStreamPath("/" + path);
+        Pattern uri = Pattern.compile("(.+):(\\d+)/(.+)");
+        Matcher m = uri.matcher(info_server.get(4).toString() + macAddress);
+        m.find();
+
+        if (m.matches()){
+
+            ip = m.group(1);
+            port = m.group(2);
+            path = m.group(3);
+
+            // Configures the SessionBuilder
+            mSession = SessionBuilder.getInstance()
+                    .setContext(getApplicationContext())
+                    .setAudioEncoder(SessionBuilder.AUDIO_AAC)
+                    .setAudioQuality(new AudioQuality(8000, 16000))
+                    .setVideoEncoder(SessionBuilder.VIDEO_H264)
+                    .setSurfaceView(surfaceView)
+                    .setCallback(this).build();
+
+            // Configures the RTSP client
+            mClient = new RtspClient();
+            mClient.setSession(mSession);
+            mClient.setCallback(this);
+
+            mClient.setCredentials(info_server.get(2).toString(), info_server.get(3).toString());
+            mClient.setServerAddress(ip, Integer.parseInt(port));
+            mClient.setStreamPath("/" + path);
+        } else {
+            Toast.makeText(this, "Ha habido un problema al iniciar el streaming", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void toggleStreaming() {
