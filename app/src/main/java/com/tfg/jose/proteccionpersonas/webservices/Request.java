@@ -62,7 +62,7 @@ public class Request {
                         double distance = -1;
 
                         try { distance = Double.parseDouble(response.get("distancia").toString()); }
-                        catch (JSONException e) { e.printStackTrace(); }
+                        catch (JSONException e) {  e.printStackTrace(); }
 
                         TextView rssi_msg = (TextView) mActivity.findViewById(R.id.res_busqueda);
                         TextView res_dist = (TextView) mActivity.findViewById(R.id.res_distancia);

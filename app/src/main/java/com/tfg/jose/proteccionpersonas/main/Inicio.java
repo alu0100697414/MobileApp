@@ -99,7 +99,7 @@ public class Inicio extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Intent toGPSEnable = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(toGPSEnable);
+                    startActivityForResult(toGPSEnable, 123);
                 }
             });
             bt_dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -185,8 +185,6 @@ public class Inicio extends AppCompatActivity {
 
         if (gps.canGetLocation() && gps != null){
             data.put("latitude", String.valueOf(gps.getLocation().getLatitude()));
-            Log.d("caca", String.valueOf(gps.getLocation().getLatitude()));
-            Log.d("caca", String.valueOf(gps.getLocation().getLongitude()));
             data.put("longitude", String.valueOf(gps.getLocation().getLongitude()));
         } else {
             data.put("latitude", "null");
@@ -411,6 +409,11 @@ public class Inicio extends AppCompatActivity {
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                         public void onClick(DialogInterface arg0, int arg1) {
+
+                            if(!executor.isShutdown()){
+                                executor.shutdown();
+                            }
+
                             // Enviamos incidencia al servidor
                             Map<String, String> data = new HashMap<String, String>();
 
@@ -458,7 +461,7 @@ public class Inicio extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
         // Si activo el Bluetooth
-        if (resultCode == -1) {
+        if (requestCode == 1 && resultCode == -1) {
             System.exit(0); // Reiniciamos la API para que no haya problema a la hora de buscar dispositivos
             this.startActivity(new Intent(this.getApplicationContext(), Inicio.class));
             invalidateOptionsMenu(); // Refrescamos el menú
@@ -466,7 +469,7 @@ public class Inicio extends AppCompatActivity {
         }
 
         // Si no lo activó
-        else if (resultCode == 0){
+        else if (requestCode == 1 && resultCode == 0){
             TextView rssi_msg = (TextView) this.findViewById(R.id.res_busqueda);
             rssi_msg.setText(R.string.b_desactivado);
 
@@ -477,6 +480,49 @@ public class Inicio extends AppCompatActivity {
 
             mNotification.bluetooth_desactivado();
         }
+
+        else if (requestCode == 123) { // GPS result
+
+            gps = new GPSTracker(this);
+            if (!gps.canGetLocation()) {
+
+                // Send GPS disabled incidence
+                Map<String, String> data = new HashMap<String, String>();
+
+                data.put("mac", BackgroundVideoRecorder.getWifiMacAddress());
+
+                List<Contact> contacto;
+                contacto = protectULLDB.recuperarINFO_USUARIO();
+
+                if(!contacto.isEmpty()){
+                    data.put("name", contacto.get(0).getName());
+                    data.put("number", contacto.get(0).getNumber());
+                } else {
+                    data.put("name", getString(R.string.no_definido));
+                    data.put("number", getString(R.string.no_definido));
+                }
+
+                data.put("type_incidence", "4");
+                data.put("text_incidence", "GPS de la víctima desactivado.");
+
+                List<String> info_server = new ArrayList<String>();
+                info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+                try { Request.sendIncidence(data, info_server.get(0)); }
+
+                catch (IOException e) { e.printStackTrace(); }
+                catch (ClassNotFoundException e) { e.printStackTrace(); }
+                catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                catch (NoSuchProviderException e) { e.printStackTrace(); }
+                catch (InvalidKeyException e) { e.printStackTrace(); }
+
+            } else {
+                // VER POR QUÉ NO FUNCIONA EL GPS AL REINICIAR LA ACTIVIDAD TRAS ACTIVARLO!!!!!!!
+                Intent intent_test = getIntent();
+                finish();
+                startActivity(intent_test);
+            }
+        }
     }
 
     @Override
@@ -485,10 +531,6 @@ public class Inicio extends AppCompatActivity {
 
         if(bleConnection.isDiscovering()){
             bleConnection.stopScanBLEDevices();
-        }
-
-        if(!executor.isShutdown()){
-            executor.shutdown();
         }
     }
 

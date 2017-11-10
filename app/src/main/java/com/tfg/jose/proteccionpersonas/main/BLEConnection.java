@@ -143,9 +143,6 @@ public class BLEConnection {
         @Override
         public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
 
-            Log.i("FIND_D", "Encontrado: " + device.getName());
-            Log.i("FIND_D", "Encontrado: " + device.getAddress());
-
             // F4:BE:76:06:43:75
             if(device.getAddress().equals("40:4E:36:04:CE:BC")){
                 btAdapter.stopLeScan(leScanCallback);
