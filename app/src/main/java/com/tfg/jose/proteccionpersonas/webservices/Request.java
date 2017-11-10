@@ -252,7 +252,7 @@ public class Request {
      *      2 -> Hace tiempo que no envía ping al servidor
      *      3 -> El agresor está por debajo de 1 km de distania de la víctima
      *      4 -> EL GPS de la víctima está desactivado.
-     *      5 -> El GPS de la víctima no pudo obtener la posición GPS.
+     *      5 -> No se pudo calcular la distancia entre víctima y agresor.
      */
     public static void sendIncidence(Map<String, String> info, String server) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         // Generamos la clave secreta con la que cifrará posteriormente el AES
