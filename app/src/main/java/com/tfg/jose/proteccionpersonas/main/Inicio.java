@@ -1,5 +1,6 @@
 package com.tfg.jose.proteccionpersonas.main;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -50,6 +52,8 @@ public class Inicio extends AppCompatActivity {
 
     ScheduledExecutorService executor;
 
+    Handler handler = new Handler();
+
     static {
         Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
     }
@@ -84,12 +88,12 @@ public class Inicio extends AppCompatActivity {
 
         pbutton.pushButton(); // Creamos el botón de pánico en la Activity
 
-        bleConnection = new BLEConnection(Inicio.this,this);
+        bleConnection = new BLEConnection(Inicio.this, this);
         bleConnection.isActivated();
 
         gps = new GPSTracker(this);
 
-        if (!gps.canGetLocation()){
+        if (!gps.canGetLocation()) {
             // Si no está activado, se envía aviso para activarlo
             AlertDialog.Builder bt_dialog = new AlertDialog.Builder(this);
             bt_dialog.setTitle("Activar GPS");
@@ -115,7 +119,7 @@ public class Inicio extends AppCompatActivity {
                     List<Contact> contacto;
                     contacto = protectULLDB.recuperarINFO_USUARIO();
 
-                    if(!contacto.isEmpty()){
+                    if (!contacto.isEmpty()) {
                         data.put("name", contacto.get(0).getName());
                         data.put("number", contacto.get(0).getNumber());
                     } else {
@@ -129,13 +133,19 @@ public class Inicio extends AppCompatActivity {
                     List<String> info_server = new ArrayList<String>();
                     info_server = protectULLDB.recuperarINFO_SERVER("1");
 
-                    try { Request.sendIncidence(data, info_server.get(0)); }
-
-                    catch (IOException e) { e.printStackTrace(); }
-                    catch (ClassNotFoundException e) { e.printStackTrace(); }
-                    catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
-                    catch (NoSuchProviderException e) { e.printStackTrace(); }
-                    catch (InvalidKeyException e) { e.printStackTrace(); }
+                    try {
+                        Request.sendIncidence(data, info_server.get(0));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchProviderException e) {
+                        e.printStackTrace();
+                    } catch (InvalidKeyException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             bt_dialog.show();
@@ -145,67 +155,78 @@ public class Inicio extends AppCompatActivity {
         // Ejecutamos el servicio de busqueda de dispositivos bluetooth cada x tiempo
         Runnable searchBleDevice = new Runnable() {
             public void run() {
-                if(bleConnection.isDiscovering()){
+                if (bleConnection.isDiscovering()) {
                     bleConnection.stopScanBLEDevices();
                 }
 
                 bleConnection.withoutDanger();
                 bleConnection.startScanBLEDevices();
-
-                try { sendPingToServer(); }
-
-                catch (ClassNotFoundException e) { e.printStackTrace(); }
-                catch (InvalidKeyException e) { e.printStackTrace(); }
-                catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
-                catch (NoSuchProviderException e) { e.printStackTrace(); }
-                catch (IOException e) { e.printStackTrace(); }
             }
         };
 
         executor.scheduleAtFixedRate(searchBleDevice, 0, 15, TimeUnit.SECONDS);
+
+        // Enviamos ping al servidor, la primera vez a los 10 segundos
+        sendPingToServer(10);
     }
 
-    public void sendPingToServer() throws ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
-        Map<String, String> data = new HashMap<String, String>();;
 
-        data.put("mac", BackgroundVideoRecorder.getWifiMacAddress());
+    public void sendPingToServer(int timeToNextPing) {
 
-        List<Contact> contacto;
-        contacto = protectULLDB.recuperarINFO_USUARIO();
+        final Inicio inicio = this;
+        final Activity activity = this;
 
-        if(!contacto.isEmpty()){
-            data.put("name", contacto.get(0).getName());
-            data.put("number", contacto.get(0).getNumber());
-        } else {
-            data.put("name", getString(R.string.no_definido));
-            data.put("number", getString(R.string.no_definido));
-        }
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
-        gps = new GPSTracker(this);
+                Map<String, String> data = new HashMap<String, String>();
 
-        if (gps.canGetLocation() && gps != null){
-            data.put("latitude", String.valueOf(gps.getLocation().getLatitude()));
-            data.put("longitude", String.valueOf(gps.getLocation().getLongitude()));
-        } else {
-            data.put("latitude", "null");
-            data.put("longitude", "null");
-            mNotification.gps_error();
-        }
+                data.put("mac", BackgroundVideoRecorder.getWifiMacAddress());
 
-        BatteryManager bm = (BatteryManager)getSystemService(BATTERY_SERVICE);
-        int batLevel = 0;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-        }
+                List<Contact> contacto;
+                contacto = protectULLDB.recuperarINFO_USUARIO();
 
-        data.put("battery", String.valueOf(batLevel));
+                if(!contacto.isEmpty()){
+                    data.put("name", contacto.get(0).getName());
+                    data.put("number", contacto.get(0).getNumber());
+                } else {
+                    data.put("name", getString(R.string.no_definido));
+                    data.put("number", getString(R.string.no_definido));
+                }
 
-        List<String> info_server = new ArrayList<String>();
-        info_server = protectULLDB.recuperarINFO_SERVER("1");
+                gps = new GPSTracker(activity.getApplicationContext());
 
-        Request.pingStatusDevice(data, info_server.get(0), this, getApplicationContext());
+                if (gps.canGetLocation() && gps != null){
+                    data.put("latitude", String.valueOf(gps.getLocation().getLatitude()));
+                    data.put("longitude", String.valueOf(gps.getLocation().getLongitude()));
+                } else {
+                    data.put("latitude", "null");
+                    data.put("longitude", "null");
+                    mNotification.gps_error();
+                }
 
-        Log.i("DATOS", info_server.get(0));
+                BatteryManager bm = (BatteryManager)getSystemService(BATTERY_SERVICE);
+                int batLevel = 0;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+                }
+
+                data.put("battery", String.valueOf(batLevel));
+
+                List<String> info_server = new ArrayList<String>();
+                info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+                try { Request.pingStatusDevice(data, info_server.get(0), inicio, activity, getApplicationContext()); }
+
+                catch (IOException e) { e.printStackTrace(); }
+                catch (ClassNotFoundException e) { e.printStackTrace(); }
+                catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                catch (NoSuchProviderException e) { e.printStackTrace(); }
+                catch (InvalidKeyException e) { e.printStackTrace(); }
+
+            }
+        }, TimeUnit.SECONDS.toMillis(timeToNextPing));
     }
 
     // Si se pulsa el botón de atrás, sigue ejecutándose la app
@@ -528,6 +549,8 @@ public class Inicio extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        handler.removeCallbacksAndMessages(null);
 
         if(bleConnection.isDiscovering()){
             bleConnection.stopScanBLEDevices();

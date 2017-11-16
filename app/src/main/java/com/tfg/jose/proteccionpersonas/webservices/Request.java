@@ -32,7 +32,7 @@ import java.util.Map;
 public class Request {
 
     // Función que envía posición de la víctima como ping
-    public static void pingStatusDevice(Map<String, String> info, String server, final Activity mActivity, final Context mContext) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
+    public static void pingStatusDevice(Map<String, String> info, String server, final Inicio inicio, final Activity mActivity, final Context mContext) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         // Generamos la clave secreta con la que cifrará posteriormente el AES
         String key = KeysReader.generateSharedKey(KeysReader.getPrivKeyClient(), KeysReader.getPubKeyServer());
 
@@ -60,8 +60,13 @@ public class Request {
                     public void onResponse(JSONObject response) {
 
                         double distance = -1;
+                        int nextPing = 10;
 
-                        try { distance = Double.parseDouble(response.get("distancia").toString()); }
+                        try {
+                            distance = Double.parseDouble(response.get("distancia").toString());
+                            nextPing = Integer.parseInt(response.get("nextPing").toString());
+                            Log.i("cacaca", response.get("nextPing").toString());
+                        }
                         catch (JSONException e) {  e.printStackTrace(); }
 
                         TextView rssi_msg = (TextView) mActivity.findViewById(R.id.res_busqueda);
@@ -96,6 +101,9 @@ public class Request {
                             rssi_msg.setText(mContext.getString(R.string.sin_peligro));
                             rssi_dist.setText("");
                         }
+
+                        // Configuramos siguiente ping
+                        inicio.sendPingToServer(nextPing);
                     }
                 },
                 new com.android.volley.Response.ErrorListener() {
