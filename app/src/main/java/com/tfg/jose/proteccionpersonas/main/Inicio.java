@@ -150,7 +150,6 @@ public class Inicio extends AppCompatActivity {
                         }
                     } else {
                         Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
-                        sendPingToServer(10);
                     }
                 }
             });
@@ -480,7 +479,6 @@ public class Inicio extends AppCompatActivity {
                                 catch (InvalidKeyException e) { e.printStackTrace(); }
                             } else {
                                 Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
-                                sendPingToServer(10);
                             }
 
                             // Cerramos aplicación
@@ -558,7 +556,6 @@ public class Inicio extends AppCompatActivity {
                     catch (InvalidKeyException e) { e.printStackTrace(); }
                 } else {
                     Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
-                    sendPingToServer(10);
                 }
 
             } else {
@@ -618,7 +615,6 @@ public class Inicio extends AppCompatActivity {
                     catch (InvalidKeyException e) { e.printStackTrace(); }
                 } else {
                     Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
-                    sendPingToServer(10);
                 }
             }
         }
