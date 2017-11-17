@@ -133,18 +133,24 @@ public class Inicio extends AppCompatActivity {
                     List<String> info_server = new ArrayList<String>();
                     info_server = protectULLDB.recuperarINFO_SERVER("1");
 
-                    try {
-                        Request.sendIncidence(data, info_server.get(0));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchAlgorithmException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchProviderException e) {
-                        e.printStackTrace();
-                    } catch (InvalidKeyException e) {
-                        e.printStackTrace();
+                    if(!info_server.isEmpty()){
+
+                        try {
+                            Request.sendIncidence(data, info_server.get(0));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (NoSuchAlgorithmException e) {
+                            e.printStackTrace();
+                        } catch (NoSuchProviderException e) {
+                            e.printStackTrace();
+                        } catch (InvalidKeyException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                        sendPingToServer(10);
                     }
                 }
             });
@@ -217,13 +223,19 @@ public class Inicio extends AppCompatActivity {
                 List<String> info_server = new ArrayList<String>();
                 info_server = protectULLDB.recuperarINFO_SERVER("1");
 
-                try { Request.pingStatusDevice(data, info_server.get(0), inicio, activity, getApplicationContext()); }
+                if(!info_server.isEmpty()){
 
-                catch (IOException e) { e.printStackTrace(); }
-                catch (ClassNotFoundException e) { e.printStackTrace(); }
-                catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
-                catch (NoSuchProviderException e) { e.printStackTrace(); }
-                catch (InvalidKeyException e) { e.printStackTrace(); }
+                    try { Request.pingStatusDevice(data, info_server.get(0), inicio, activity, getApplicationContext()); }
+
+                    catch (IOException e) { e.printStackTrace(); }
+                    catch (ClassNotFoundException e) { e.printStackTrace(); }
+                    catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                    catch (NoSuchProviderException e) { e.printStackTrace(); }
+                    catch (InvalidKeyException e) { e.printStackTrace(); }
+                } else {
+                    Toast.makeText(activity, "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                    sendPingToServer(10);
+                }
 
             }
         }, TimeUnit.SECONDS.toMillis(timeToNextPing));
@@ -457,13 +469,19 @@ public class Inicio extends AppCompatActivity {
                             List<String> info_server = new ArrayList<String>();
                             info_server = protectULLDB.recuperarINFO_SERVER("1");
 
-                            try { Request.sendIncidence(data, info_server.get(0)); }
+                            if(!info_server.isEmpty()){
 
-                            catch (IOException e) { e.printStackTrace(); }
-                            catch (ClassNotFoundException e) { e.printStackTrace(); }
-                            catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
-                            catch (NoSuchProviderException e) { e.printStackTrace(); }
-                            catch (InvalidKeyException e) { e.printStackTrace(); }
+                                try { Request.sendIncidence(data, info_server.get(0)); }
+
+                                catch (IOException e) { e.printStackTrace(); }
+                                catch (ClassNotFoundException e) { e.printStackTrace(); }
+                                catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                                catch (NoSuchProviderException e) { e.printStackTrace(); }
+                                catch (InvalidKeyException e) { e.printStackTrace(); }
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                                sendPingToServer(10);
+                            }
 
                             // Cerramos aplicación
                             Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -529,13 +547,19 @@ public class Inicio extends AppCompatActivity {
                 List<String> info_server = new ArrayList<String>();
                 info_server = protectULLDB.recuperarINFO_SERVER("1");
 
-                try { Request.sendIncidence(data, info_server.get(0)); }
+                if(!info_server.isEmpty()){
 
-                catch (IOException e) { e.printStackTrace(); }
-                catch (ClassNotFoundException e) { e.printStackTrace(); }
-                catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
-                catch (NoSuchProviderException e) { e.printStackTrace(); }
-                catch (InvalidKeyException e) { e.printStackTrace(); }
+                    try { Request.sendIncidence(data, info_server.get(0)); }
+
+                    catch (IOException e) { e.printStackTrace(); }
+                    catch (ClassNotFoundException e) { e.printStackTrace(); }
+                    catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                    catch (NoSuchProviderException e) { e.printStackTrace(); }
+                    catch (InvalidKeyException e) { e.printStackTrace(); }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                    sendPingToServer(10);
+                }
 
             } else {
                 // VER POR QUÉ NO FUNCIONA EL GPS AL REINICIAR LA ACTIVIDAD TRAS ACTIVARLO!!!!!!!
@@ -583,13 +607,19 @@ public class Inicio extends AppCompatActivity {
                 List<String> info_server = new ArrayList<String>();
                 info_server = protectULLDB.recuperarINFO_SERVER("1");
 
-                try { Request.sendIncidence(data, info_server.get(0)); }
+                if(!info_server.isEmpty()){
 
-                catch (IOException e) { e.printStackTrace(); }
-                catch (ClassNotFoundException e) { e.printStackTrace(); }
-                catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
-                catch (NoSuchProviderException e) { e.printStackTrace(); }
-                catch (InvalidKeyException e) { e.printStackTrace(); }
+                    try { Request.sendIncidence(data, info_server.get(0)); }
+
+                    catch (IOException e) { e.printStackTrace(); }
+                    catch (ClassNotFoundException e) { e.printStackTrace(); }
+                    catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                    catch (NoSuchProviderException e) { e.printStackTrace(); }
+                    catch (InvalidKeyException e) { e.printStackTrace(); }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                    sendPingToServer(10);
+                }
             }
         }
     }
