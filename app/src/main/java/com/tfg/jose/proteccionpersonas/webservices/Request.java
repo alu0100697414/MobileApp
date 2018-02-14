@@ -81,12 +81,19 @@ public class Request {
                             res_dist.setText((int) (distance*1000) + "m");
 
                             mNotification.notificar_radio();
-                        } else if(distance <= 0.5 && distance >= 0){ // DANGER
+                        } else if(distance <= 0.5 && distance >= 0.1){ // DANGER
                             rssi_msg.setText(mContext.getString(R.string.peligro) + "\n" + mContext.getString(R.string.mensaje_peligro));
                             res_dist.setText((int) (distance*1000) + "m");
 
-//                            rssi_msg.setText("URGENTE" + "\n" + "El agresor ha sido detectado por Bluetooth y está muy próximo a usted");
-//                            res_dist.setText("80m");
+                            // Notificamos a la víctima
+                            mNotification.notificar_limite();
+
+                            // Notificamos a los contactos
+//                            mNotification.enviar_sms();
+//                            mNotification.setSms_enviado(1);
+                        } else if(distance < 0.1 && distance >= 0) { // URGENT
+                            rssi_msg.setText("URGENTE" + "\n" + "El agresor está muy próximo a usted.");
+                            res_dist.setText((int) (distance*1000) + "m");
 
                             // Notificamos a la víctima
                             mNotification.notificar_limite();
