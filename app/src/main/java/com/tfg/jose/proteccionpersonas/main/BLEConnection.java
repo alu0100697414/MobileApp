@@ -143,13 +143,18 @@ public class BLEConnection {
         @Override
         public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
 
-            // F4:BE:76:06:43:75
-            if(device.getAddress().equals("40:4E:36:04:CE:BC")){
+            /*
+            *  Este LOG devuelve todas las MAC que está detectando actualmente la app.
+            *  Una vez detectada la MAC de la app que simula el beacon, cambiarla en el
+            *  siguiente IF del código.
+            * */
+            Log.i("BLE_MAC", String.valueOf(device.getAddress()));
+
+            if(device.getAddress().equals("72:0C:65:BF:F0:96")){
                 btAdapter.stopLeScan(leScanCallback);
 
                 // Calculamos la distancia aproximada
                 double distance = getDistance(rssi, px);
-                Log.i("BLE_DIST", String.valueOf(distance) + " metros.");
 
                 deviceFound = true; // Encontró el dispositivo
 
