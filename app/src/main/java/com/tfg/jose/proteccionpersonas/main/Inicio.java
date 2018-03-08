@@ -44,6 +44,12 @@ import java.util.concurrent.TimeUnit;
 
 public class Inicio extends AppCompatActivity {
 
+    private static final String URL_SERVER = "**************";
+    private static final String URL_STREAMING = "***********";
+    private static final String USER_STREAMING = "**********";
+    private static final String PASSWORD_STREAMING = "******";
+    private static final String SHORT_URL_SERVER = "********";
+
     private PanicButton pbutton;
     private Notification mNotification;
     private DBase protectULLDB;
@@ -399,13 +405,15 @@ public class Inicio extends AppCompatActivity {
             final EditText pass_server = (EditText) textEntryView.findViewById(R.id.pass_server);
             final EditText short_streaming_url = (EditText) textEntryView.findViewById(R.id.short_streaming_url);
 
-            if(!info_server.isEmpty()){
-                url_servidor.setText(info_server.get(0));
-                url_streaming.setText(info_server.get(1));
-                user_server.setText(info_server.get(2));
-                pass_server.setText(info_server.get(3));
-                short_streaming_url.setText(info_server.get(4));
+            if(info_server.isEmpty()){
+                protectULLDB.insertarINFO_SERVER("1", URL_SERVER, URL_STREAMING, USER_STREAMING, PASSWORD_STREAMING, SHORT_URL_SERVER);
             }
+
+            url_servidor.setText(info_server.get(0));
+            url_streaming.setText(info_server.get(1));
+            user_server.setText(info_server.get(2));
+            pass_server.setText(info_server.get(3));
+            short_streaming_url.setText(info_server.get(4));
 
             final View vista = this.findViewById(android.R.id.content);
 
