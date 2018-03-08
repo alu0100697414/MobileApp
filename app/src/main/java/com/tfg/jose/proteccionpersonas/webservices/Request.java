@@ -268,6 +268,7 @@ public class Request {
      *      3 -> El agresor está por debajo de 1 km de distania de la víctima
      *      4 -> EL GPS de la víctima está desactivado.
      *      5 -> No se pudo calcular la distancia entre víctima y agresor.
+     *      6 -> Se pulsó el botón de pánico.
      */
     public static void sendIncidence(Map<String, String> info, String server) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         // Generamos la clave secreta con la que cifrará posteriormente el AES
@@ -288,6 +289,26 @@ public class Request {
 
         // Creamos el JSON y lo añadimos a la cola
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, server + "/newincidence/" + info.get("mac"), new JSONObject(params),
+                new com.android.volley.Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i("Volley Ping ", response.toString());
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.i("Volley Ping Error ", error.toString());
+                    }
+                });
+
+        Config.requestQueue.add(jsonObjectRequest);
+    }
+
+    // Avisa al servidor de que ha sido pulsado el botón de pánico
+    public static void panicButtonPushed(Map<String, String> info, String server) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, server + "/panicbutton/" + info.get("mac"),
                 new com.android.volley.Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
