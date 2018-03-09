@@ -150,31 +150,29 @@ public class BLEConnection {
             * */
             Log.i("BLE_MAC", String.valueOf(device.getAddress()));
 
-            if(device.getAddress().equals("72:0C:65:BF:F0:96")){
+            if(device.getAddress().equals("63:B8:D9:57:96:27")){
                 btAdapter.stopLeScan(leScanCallback);
 
                 // Calculamos la distancia aproximada
-                double distance = getDistance(rssi, px);
+                //double distance = getDistance(rssi, px);
 
                 deviceFound = true; // Encontró el dispositivo
 
                 // Parseamos el resultado para que muestre dos decimales
-                DecimalFormat df = new DecimalFormat("#.##");
-                String rdistance = df.format(distance);
+                //DecimalFormat df = new DecimalFormat("#.##");
+                //String rdistance = df.format(distance);
 
                 TextView rssi_msg = (TextView) mActivity.findViewById(R.id.res_busqueda);
-                TextView res_dist = (TextView) mActivity.findViewById(R.id.res_distancia);
+                //TextView res_dist = (TextView) mActivity.findViewById(R.id.res_distancia);
 
                 // Si el agresor supera la distancia límite
                 rssi_msg.setText("URGENTE" + "\n" + "El agresor está muy próximo a usted.");
-                res_dist.setText(rdistance + "m");
+                // res_dist.setText(rdistance + "m");
 
                 // Notificamos a la víctima
                 mNotification.notificar_limite();
 
                 // Notificamos a los contactos
-                // Mirar error al enviar sms
-                // (https://stackoverflow.com/questions/32742327/neither-user-10102-nor-current-process-has-android-permission-read-phone-state)
 //                mNotification.enviar_sms();
 //                mNotification.setSms_enviado(1);
 

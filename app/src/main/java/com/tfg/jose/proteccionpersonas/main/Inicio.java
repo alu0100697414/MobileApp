@@ -44,11 +44,11 @@ import java.util.concurrent.TimeUnit;
 
 public class Inicio extends AppCompatActivity {
 
-    private static final String URL_SERVER = "**************";
-    private static final String URL_STREAMING = "***********";
-    private static final String USER_STREAMING = "**********";
-    private static final String PASSWORD_STREAMING = "******";
-    private static final String SHORT_URL_SERVER = "********";
+    private static final String URL_SERVER = "********************";
+    private static final String URL_STREAMING = "*****************";
+    private static final String USER_STREAMING = "****************";
+    private static final String PASSWORD_STREAMING = "************";
+    private static final String SHORT_URL_SERVER = "**************";
 
     private PanicButton pbutton;
     private Notification mNotification;
@@ -89,6 +89,14 @@ public class Inicio extends AppCompatActivity {
 
         // Inicializamos la base de datos
         protectULLDB = new DBase(getApplicationContext());
+
+        // Pre-configuramos los valores del servidor
+        List<String> info_server = new ArrayList<String>();
+        info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+        if(info_server.isEmpty()){
+            protectULLDB.insertarINFO_SERVER("1", URL_SERVER, URL_STREAMING, USER_STREAMING, PASSWORD_STREAMING, SHORT_URL_SERVER);
+        }
 
         Config.requestQueue = Volley.newRequestQueue(this);
 
@@ -294,21 +302,34 @@ public class Inicio extends AppCompatActivity {
         }
 
         if(id == R.id.video){
-            if(bleConnection.isMyServiceRunning(BackgroundVideoRecorder.class) == true){
-                stopService(new Intent(this, BackgroundVideoRecorder.class));
-                invalidateOptionsMenu(); // Refrecamos el menú
 
-                TextView grabando = (TextView) findViewById(R.id.grabando);
-                grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
-                grabando.setVisibility(View.INVISIBLE);
+            List<String> info_server = new ArrayList<String>();
+            info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+            if(bleConnection.isMyServiceRunning(BackgroundVideoRecorder.class) == true){
+
+                if(!info_server.isEmpty()){
+                    stopService(new Intent(this, BackgroundVideoRecorder.class));
+                    invalidateOptionsMenu(); // Refrecamos el menú
+
+                    TextView grabando = (TextView) findViewById(R.id.grabando);
+                    grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
+                    grabando.setVisibility(View.INVISIBLE);
+                } else {
+                    Toast.makeText(this, "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                }
             }
             else {
-                startService(new Intent(this, BackgroundVideoRecorder.class));
-                invalidateOptionsMenu(); // Refrecamos el menú
+                if(!info_server.isEmpty()){
+                    startService(new Intent(this, BackgroundVideoRecorder.class));
+                    invalidateOptionsMenu(); // Refrecamos el menú
 
-                TextView grabando = (TextView) findViewById(R.id.grabando);
-                grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
-                grabando.setVisibility(View.VISIBLE);
+                    TextView grabando = (TextView) findViewById(R.id.grabando);
+                    grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
+                    grabando.setVisibility(View.VISIBLE);
+                } else {
+                    Toast.makeText(this, "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                }
             }
         }
 
@@ -405,15 +426,13 @@ public class Inicio extends AppCompatActivity {
             final EditText pass_server = (EditText) textEntryView.findViewById(R.id.pass_server);
             final EditText short_streaming_url = (EditText) textEntryView.findViewById(R.id.short_streaming_url);
 
-            if(info_server.isEmpty()){
-                protectULLDB.insertarINFO_SERVER("1", URL_SERVER, URL_STREAMING, USER_STREAMING, PASSWORD_STREAMING, SHORT_URL_SERVER);
+            if(!info_server.isEmpty()){
+                url_servidor.setText(info_server.get(0));
+                url_streaming.setText(info_server.get(1));
+                user_server.setText(info_server.get(2));
+                pass_server.setText(info_server.get(3));
+                short_streaming_url.setText(info_server.get(4));
             }
-
-            url_servidor.setText(info_server.get(0));
-            url_streaming.setText(info_server.get(1));
-            user_server.setText(info_server.get(2));
-            pass_server.setText(info_server.get(3));
-            short_streaming_url.setText(info_server.get(4));
 
             final View vista = this.findViewById(android.R.id.content);
 
