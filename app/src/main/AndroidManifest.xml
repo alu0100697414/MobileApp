@@ -31,7 +31,9 @@
         <activity
             android:name=".main.Autentication"
             android:label="@string/title_activity_autentication"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
 
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.MAIN" />
@@ -43,7 +45,9 @@
             android:name=".main.Inicio"
             android:label="@string/inicio_name"
             android:launchMode="singleInstance"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -54,7 +58,9 @@
             android:name=".main.ContactList"
             android:label="@string/title_activity_contact_list"
             android:parentActivityName=".main.Inicio"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tfg.jose.proteccionpersonas.main.Inicio" />
