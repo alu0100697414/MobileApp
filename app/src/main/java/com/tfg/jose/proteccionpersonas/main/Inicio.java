@@ -529,8 +529,8 @@ public class Inicio extends AppCompatActivity {
 
         // Si activo el Bluetooth
         if (requestCode == 1 && resultCode == -1) {
-            System.exit(0); // Reiniciamos la API para que no haya problema a la hora de buscar dispositivos
-            this.startActivity(new Intent(this.getApplicationContext(), Inicio.class));
+            finish();
+            startActivity(new Intent(this.getApplicationContext(), Inicio.class));
             invalidateOptionsMenu(); // Refrescamos el menú
             Toast.makeText(Inicio.this, R.string.b_activado, Toast.LENGTH_SHORT).show();
         }
