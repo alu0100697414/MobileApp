@@ -51,8 +51,6 @@ public class Request {
         params.put("latitude", CLatitude);
         params.put("longitude", CLongitude);
 
-        Log.i("LOG_TEST", "Llamada");
-
         // Creamos el JSON y lo añadimos a la cola
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.PUT, server + "/statusdevice/" + info.get("mac"), new JSONObject(params),
                 new com.android.volley.Response.Listener<JSONObject>() {
@@ -65,7 +63,6 @@ public class Request {
                         try {
                             distance = Double.parseDouble(response.get("distancia").toString());
                             nextPing = Integer.parseInt(response.get("nextPing").toString());
-                            Log.i("cacaca", response.get("nextPing").toString());
                         }
                         catch (JSONException e) {  e.printStackTrace(); }
 
@@ -117,6 +114,15 @@ public class Request {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.i("Volley Ping Error ", error.toString());
+
+                        TextView rssi_msg = (TextView) mActivity.findViewById(R.id.res_busqueda);
+                        TextView rssi_dist = (TextView) mActivity.findViewById(R.id.res_distancia);
+
+                        rssi_msg.setText(mContext.getString(R.string.error_distancia));
+                        rssi_dist.setText("");
+
+                        // Configuramos siguiente ping
+                        inicio.sendPingToServer(10);
                     }
                 });
 
