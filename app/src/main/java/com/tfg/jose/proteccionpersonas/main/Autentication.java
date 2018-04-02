@@ -48,6 +48,7 @@ public class Autentication extends AppCompatActivity {
                 if(password.equals(input.getText().toString())){
                     input.setText("");
                     startActivity(new Intent(Autentication.this, Inicio.class));
+                    finish();
                 } else {
                     Snackbar.make(v, R.string.pass_incorrecta, Snackbar.LENGTH_LONG).show();
                 }

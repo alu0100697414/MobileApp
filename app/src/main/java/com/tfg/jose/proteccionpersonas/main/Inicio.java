@@ -27,6 +27,7 @@ import com.android.volley.toolbox.Volley;
 import com.tfg.jose.proteccionpersonas.R;
 import com.tfg.jose.proteccionpersonas.gps.GPSTracker;
 import com.tfg.jose.proteccionpersonas.webservices.Config;
+import com.tfg.jose.proteccionpersonas.webservices.Network;
 import com.tfg.jose.proteccionpersonas.webservices.Request;
 
 import java.io.IOException;
@@ -44,11 +45,11 @@ import java.util.concurrent.TimeUnit;
 
 public class Inicio extends AppCompatActivity {
 
-    private static final String URL_SERVER = "********************";
-    private static final String URL_STREAMING = "*****************";
-    private static final String USER_STREAMING = "****************";
-    private static final String PASSWORD_STREAMING = "************";
-    private static final String SHORT_URL_SERVER = "**************";
+    private static final String URL_SERVER = "http://4tl4s.duckdns.org:8000";
+    private static final String URL_STREAMING = "rtsp://4tl4s.duckdns.org:1935/live/";
+    private static final String USER_STREAMING = "streaming_atlas";
+    private static final String PASSWORD_STREAMING = "atlas2017";
+    private static final String SHORT_URL_SERVER = "4tl4s.duckdns.org:1935/live/";
 
     private PanicButton pbutton;
     private Notification mNotification;
@@ -82,6 +83,8 @@ public class Inicio extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         toolbar.setLogo(R.mipmap.ic_launcher);
+
+        new Network().handleSSLHandshake();
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_SHUTDOWN);
         BroadcastReceiver mReceiver = new ShutDownReceiver();

@@ -195,6 +195,13 @@ public class ContactList extends AppCompatActivity {
         });
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
 
@@ -260,6 +267,7 @@ public class ContactList extends AppCompatActivity {
     // Vuelve a la activity Inicio
     @Override
     public void onBackPressed() {
+        finish();
         startActivity(new Intent(ContactList.this, Inicio.class));
     }
 
