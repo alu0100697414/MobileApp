@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +31,8 @@ import com.tfg.jose.proteccionpersonas.gps.GPSTracker;
 import com.tfg.jose.proteccionpersonas.webservices.Config;
 import com.tfg.jose.proteccionpersonas.webservices.Network;
 import com.tfg.jose.proteccionpersonas.webservices.Request;
+import com.vikramezhil.droidspeech.DroidSpeech;
+import com.vikramezhil.droidspeech.OnDSListener;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -56,6 +60,8 @@ public class Inicio extends AppCompatActivity {
     private DBase protectULLDB;
     private BLEConnection bleConnection;
     private GPSTracker gps;
+
+    private DroidSpeech droidSpeech;
 
     ScheduledExecutorService executor;
 
@@ -190,6 +196,72 @@ public class Inicio extends AppCompatActivity {
 
         // Enviamos ping al servidor, la primera vez a los 10 segundos
         sendPingToServer(10);
+
+        // Inicializamos el reconocimiento por voz
+//        mSpeechManager = new SpeechManager(this, mSpeechListener);
+//        mSpeechManager.initialize();
+
+        droidSpeech = new DroidSpeech(this, null);
+        droidSpeech.setContinuousSpeechRecognition(true);
+        droidSpeech.setOnDroidSpeechListener(new OnDSListener() {
+            @Override
+            public void onDroidSpeechSupportedLanguages(String currentSpeechLanguage, List<String> supportedSpeechLanguages) {
+
+            }
+
+            @Override
+            public void onDroidSpeechRmsChanged(float rmsChangedValue) {
+
+            }
+
+            @Override
+            public void onDroidSpeechLiveResult(String liveSpeechResult) {
+
+                if(liveSpeechResult.equals("ayuda") || liveSpeechResult.equals("AYUDA")){
+
+                    // Envía aviso de que ha sido pulsado el botón de pánico
+                    Map<String, String> data = new HashMap<String, String>();
+
+                    data.put("mac", BackgroundVideoRecorder.getWifiMacAddress());
+
+                    List<String> info_server = new ArrayList<String>();
+                    info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+                    if(!info_server.isEmpty()){
+
+                        try { Request.panicButtonPushed(data, info_server.get(0)); }
+
+                        catch (IOException e) { e.printStackTrace(); }
+                        catch (ClassNotFoundException e) { e.printStackTrace(); }
+                        catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                        catch (NoSuchProviderException e) { e.printStackTrace(); }
+                        catch (InvalidKeyException e) { e.printStackTrace(); }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                    }
+
+                    // Realiza llamada
+                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                    callIntent.setData(Uri.parse(pbutton.getTelefono()));
+                    startActivity(callIntent);
+                }
+            }
+
+            @Override
+            public void onDroidSpeechFinalResult(String finalSpeechResult) {
+
+            }
+
+            @Override
+            public void onDroidSpeechClosedByUser() {
+
+            }
+
+            @Override
+            public void onDroidSpeechError(String errorMsg) {
+
+            }
+        });
     }
 
 
@@ -598,10 +670,19 @@ public class Inicio extends AppCompatActivity {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        droidSpeech.startDroidSpeechRecognition();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
 
         handler.removeCallbacksAndMessages(null);
+
+        droidSpeech.closeDroidSpeechOperations();
 
         if(bleConnection.isDiscovering()){
             bleConnection.stopScanBLEDevices();

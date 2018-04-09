@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.tfg.jose.proteccionpersonas"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -31,4 +31,5 @@ dependencies {
     compile 'com.madgag.spongycastle:prov:1.54.0.0'
     compile 'com.madgag.spongycastle:pkix:1.54.0.0'
     compile 'com.madgag.spongycastle:pg:1.54.0.0'
+    compile 'com.github.vikramezhil:DroidSpeech:v2.0.3'
 }

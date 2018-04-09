@@ -82,4 +82,7 @@ public class PanicButton {
         });
     }
 
+    public String getTelefono() {
+        return telefono;
+    }
 }
