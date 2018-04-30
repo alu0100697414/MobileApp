@@ -112,6 +112,11 @@ public class Inicio extends AppCompatActivity {
         pbutton.pushButton(); // Creamos el botón de pánico en la Activity
 
         bleConnection = new BLEConnection(Inicio.this, this);
+
+        // Quitamos audio para que no se escuche el beep de reconocimiento de voz
+        AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+
         bleConnection.isActivated();
 
         gps = new GPSTracker(this);

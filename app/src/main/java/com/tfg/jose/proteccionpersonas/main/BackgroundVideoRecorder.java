@@ -56,8 +56,6 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
 
     private DBase protectULLDB;
 
-    private NetworkInfo mWifi;
-
     private List<String> info_server;
 
     private String userName;
@@ -116,12 +114,8 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
         macAddress = getWifiMacAddress();
         Log.d("MAC Address = ", macAddress);
 
-        // Comprobamos si está conectado el móvil a una wifi
-        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
         // Si está conectado, enviamos el vídeo en streaming.
-        if (mWifi.isConnected()) {
+        if (isNetworkAvailable(getApplicationContext())) {
             // Inicializa el cliente RTSP
             initRtspClient();
             Config.requestQueue = Volley.newRequestQueue(this);
@@ -175,8 +169,8 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
     // Método llamado despues de crear la surface (inicializa y empieza la grabación)
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
-        // Si el wifi está desconectado, guardamos el vídeo.
-        if (!mWifi.isConnected()) {
+        // Si el dispositivo está desconectado, guardamos el vídeo.
+        if (!isNetworkAvailable(getApplicationContext())) {
 
             camera = Camera.open();
             Camera.Parameters params = camera.getParameters();
@@ -185,6 +179,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
 
             mediaRecorder = new MediaRecorder();
 
+            camera.lock();
             camera.unlock();
 
             mediaRecorder.setPreviewDisplay(surfaceHolder.getSurface());
@@ -192,7 +187,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
             mediaRecorder.setOrientationHint(90);
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+            mediaRecorder.setProfile(CamcorderProfile.get(0, CamcorderProfile.QUALITY_HIGH));
             mediaRecorder.setOutputFile(
                     Environment.getExternalStorageDirectory()+"/"+
                             DateFormat.format("yyyy-MM-dd_kk-mm-ss", new Date().getTime())+
@@ -264,7 +259,7 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
     public void onDestroy() {
 
         // Si se está enviando un vídeo en streaming, lo paramos
-        if (mWifi.isConnected()) {
+        if (isNetworkAvailable(getApplicationContext())) {
             toggleStreaming();
 
             try {
@@ -354,5 +349,12 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
     @Override
     public void onSessionStopped() {
 
+    }
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }
