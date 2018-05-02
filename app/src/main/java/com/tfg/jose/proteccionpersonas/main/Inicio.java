@@ -208,6 +208,7 @@ public class Inicio extends AppCompatActivity {
 
         droidSpeech = new DroidSpeech(this, null);
         droidSpeech.setContinuousSpeechRecognition(true);
+        droidSpeech.setOfflineSpeechRecognition(true);
         droidSpeech.setOnDroidSpeechListener(new OnDSListener() {
             @Override
             public void onDroidSpeechSupportedLanguages(String currentSpeechLanguage, List<String> supportedSpeechLanguages) {

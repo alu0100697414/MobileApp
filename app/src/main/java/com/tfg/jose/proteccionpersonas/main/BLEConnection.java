@@ -150,7 +150,7 @@ public class BLEConnection {
             * */
             Log.i("BLE_MAC", String.valueOf(device.getAddress()));
 
-            if(device.getAddress().equals("63:B8:D9:57:96:27")){
+            if(device.getAddress().equals("1C:27:E4:5F:C3:5B")){
                 btAdapter.stopLeScan(leScanCallback);
 
                 // Calculamos la distancia aproximada
@@ -173,8 +173,8 @@ public class BLEConnection {
                 mNotification.notificar_limite();
 
                 // Notificamos a los contactos
-//                mNotification.enviar_sms();
-//                mNotification.setSms_enviado(1);
+                mNotification.enviar_sms();
+                mNotification.setSms_enviado(1);
 
                 // Abrimos aplicación si está en segundo plano
                 if(mActivity.hasWindowFocus() == false) {
