@@ -379,7 +379,7 @@ public class Inicio extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_contactos) {
-            startActivity(new Intent(Inicio.this,ContactList.class));
+            startActivity(new Intent(this, ContactList.class));
         }
 
         if(id == R.id.video){
