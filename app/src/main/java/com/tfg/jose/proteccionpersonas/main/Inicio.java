@@ -63,6 +63,8 @@ public class Inicio extends AppCompatActivity {
 
     private DroidSpeech droidSpeech;
 
+    public static boolean isLoadingRecording = false;
+
     ScheduledExecutorService executor;
 
     Handler handler = new Handler();
@@ -203,71 +205,7 @@ public class Inicio extends AppCompatActivity {
         sendPingToServer(10);
 
         // Inicializamos el reconocimiento por voz
-//        mSpeechManager = new SpeechManager(this, mSpeechListener);
-//        mSpeechManager.initialize();
-
-        droidSpeech = new DroidSpeech(this, null);
-        droidSpeech.setContinuousSpeechRecognition(true);
-        droidSpeech.setOfflineSpeechRecognition(true);
-        droidSpeech.setOnDroidSpeechListener(new OnDSListener() {
-            @Override
-            public void onDroidSpeechSupportedLanguages(String currentSpeechLanguage, List<String> supportedSpeechLanguages) {
-
-            }
-
-            @Override
-            public void onDroidSpeechRmsChanged(float rmsChangedValue) {
-
-            }
-
-            @Override
-            public void onDroidSpeechLiveResult(String liveSpeechResult) {
-
-                if(liveSpeechResult.equals("ayuda") || liveSpeechResult.equals("AYUDA")){
-
-                    // Envía aviso de que ha sido pulsado el botón de pánico
-                    Map<String, String> data = new HashMap<String, String>();
-
-                    data.put("mac", BackgroundVideoRecorder.getWifiMacAddress());
-
-                    List<String> info_server = new ArrayList<String>();
-                    info_server = protectULLDB.recuperarINFO_SERVER("1");
-
-                    if(!info_server.isEmpty()){
-
-                        try { Request.panicButtonPushed(data, info_server.get(0)); }
-
-                        catch (IOException e) { e.printStackTrace(); }
-                        catch (ClassNotFoundException e) { e.printStackTrace(); }
-                        catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
-                        catch (NoSuchProviderException e) { e.printStackTrace(); }
-                        catch (InvalidKeyException e) { e.printStackTrace(); }
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
-                    }
-
-                    // Realiza llamada
-                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse(pbutton.getTelefono()));
-                    startActivity(callIntent);
-                }
-            }
-
-            @Override
-            public void onDroidSpeechFinalResult(String finalSpeechResult) {
-
-            }
-
-            @Override
-            public void onDroidSpeechClosedByUser() {
-
-            }
-
-            @Override
-            public void onDroidSpeechError(String errorMsg) {
-
-            }
-        });
+        initSpeechToText();
     }
 
 
@@ -335,6 +273,74 @@ public class Inicio extends AppCompatActivity {
         }, TimeUnit.SECONDS.toMillis(timeToNextPing));
     }
 
+    private void initSpeechToText(){
+
+        droidSpeech = new DroidSpeech(this, null);
+        droidSpeech.setContinuousSpeechRecognition(true);
+        droidSpeech.setOfflineSpeechRecognition(true);
+        droidSpeech.setOnDroidSpeechListener(new OnDSListener() {
+            @Override
+            public void onDroidSpeechSupportedLanguages(String currentSpeechLanguage, List<String> supportedSpeechLanguages) {
+
+            }
+
+            @Override
+            public void onDroidSpeechRmsChanged(float rmsChangedValue) {
+
+            }
+
+            @Override
+            public void onDroidSpeechLiveResult(String liveSpeechResult) {
+
+                if(liveSpeechResult.equals("ayuda") || liveSpeechResult.equals("AYUDA")){
+
+                    // Envía aviso de que ha sido pulsado el botón de pánico
+                    Map<String, String> data = new HashMap<String, String>();
+
+                    data.put("mac", BackgroundVideoRecorder.getWifiMacAddress());
+
+                    List<String> info_server = new ArrayList<String>();
+                    info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+                    if(!info_server.isEmpty()){
+
+                        try { Request.panicButtonPushed(data, info_server.get(0)); }
+
+                        catch (IOException e) { e.printStackTrace(); }
+                        catch (ClassNotFoundException e) { e.printStackTrace(); }
+                        catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+                        catch (NoSuchProviderException e) { e.printStackTrace(); }
+                        catch (InvalidKeyException e) { e.printStackTrace(); }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                    }
+
+                    // Realiza llamada
+                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                    callIntent.setData(Uri.parse(pbutton.getTelefono()));
+                    startActivity(callIntent);
+                }
+            }
+
+            @Override
+            public void onDroidSpeechFinalResult(String finalSpeechResult) {
+
+            }
+
+            @Override
+            public void onDroidSpeechClosedByUser() {
+
+            }
+
+            @Override
+            public void onDroidSpeechError(String errorMsg) {
+
+            }
+        });
+
+        droidSpeech.startDroidSpeechRecognition();
+    }
+
     // Si se pulsa el botón de atrás, sigue ejecutándose la app
     @Override
     public void onBackPressed() {
@@ -384,32 +390,43 @@ public class Inicio extends AppCompatActivity {
 
         if(id == R.id.video){
 
-            List<String> info_server = new ArrayList<String>();
-            info_server = protectULLDB.recuperarINFO_SERVER("1");
+            if(!isLoadingRecording) {
+                List<String> info_server = new ArrayList<String>();
+                info_server = protectULLDB.recuperarINFO_SERVER("1");
 
-            if(bleConnection.isMyServiceRunning(BackgroundVideoRecorder.class) == true){
+                if (bleConnection.isMyServiceRunning(BackgroundVideoRecorder.class) == true) {
+                    if (!info_server.isEmpty()) {
+                        isLoadingRecording = true;
 
-                if(!info_server.isEmpty()){
-                    stopService(new Intent(this, BackgroundVideoRecorder.class));
-                    invalidateOptionsMenu(); // Refrecamos el menú
+                        stopService(new Intent(this, BackgroundVideoRecorder.class));
 
-                    TextView grabando = (TextView) findViewById(R.id.grabando);
-                    grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
-                    grabando.setVisibility(View.INVISIBLE);
+                        invalidateOptionsMenu(); // Refrecamos el menú
+
+                        TextView grabando = (TextView) findViewById(R.id.grabando);
+                        grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
+                        grabando.setVisibility(View.INVISIBLE);
+
+//                    initSpeechToText();
+
+                    } else {
+                        Toast.makeText(this, "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(this, "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
-                }
-            }
-            else {
-                if(!info_server.isEmpty()){
-                    startService(new Intent(this, BackgroundVideoRecorder.class));
-                    invalidateOptionsMenu(); // Refrecamos el menú
+                    if (!info_server.isEmpty()) {
+//                      droidSpeech.closeDroidSpeechOperations();
+//                      droidSpeech = null;
 
-                    TextView grabando = (TextView) findViewById(R.id.grabando);
-                    grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
-                    grabando.setVisibility(View.VISIBLE);
-                } else {
-                    Toast.makeText(this, "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                        isLoadingRecording = true;
+
+                        TextView grabando = (TextView) findViewById(R.id.grabando);
+                        grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
+                        grabando.setVisibility(View.VISIBLE);
+
+                        startService(new Intent(getApplicationContext(), BackgroundVideoRecorder.class));
+                        invalidateOptionsMenu(); // Refrecamos el menú
+                    } else {
+                        Toast.makeText(this, "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         }
@@ -673,13 +690,6 @@ public class Inicio extends AppCompatActivity {
                 startActivity(intent_test);
             }
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        droidSpeech.startDroidSpeechRecognition();
     }
 
     @Override

@@ -12,6 +12,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -194,10 +195,19 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
                             ".mp4"
             );
 
-            try { mediaRecorder.prepare(); }
+            try {
+                mediaRecorder.prepare();
+                mediaRecorder.start();
+            }
             catch (Exception e) {}
 
-            mediaRecorder.start();
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Inicio.isLoadingRecording = false;
+                }
+            }, 1500);
         }
         else {
             // Sino, iniciamos el vídeo en streaming
@@ -247,6 +257,14 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
         if (!mClient.isStreaming()) {
             mSession.startPreview(); // Start camera preview
             mClient.startStream(); // Start video stream
+
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Inicio.isLoadingRecording = false;
+                }
+            }, 1500);
         } else {
             // If already streaming, stop streaming
             mSession.stopPreview(); // stop camera preview
@@ -292,6 +310,14 @@ public class BackgroundVideoRecorder extends Service implements RtspClient.Callb
         }
 
         windowManager.removeView(surfaceView);
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Inicio.isLoadingRecording = false;
+            }
+        }, 1500);
     }
 
     @Override
