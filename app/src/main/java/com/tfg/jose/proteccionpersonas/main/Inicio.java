@@ -7,7 +7,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioFormat;
 import android.media.AudioManager;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -61,7 +64,7 @@ public class Inicio extends AppCompatActivity {
     private BLEConnection bleConnection;
     private GPSTracker gps;
 
-    private DroidSpeech droidSpeech;
+    public static DroidSpeech droidSpeech;
 
     public static boolean isLoadingRecording = false;
 
@@ -235,7 +238,7 @@ public class Inicio extends AppCompatActivity {
 
                 gps = new GPSTracker(activity.getApplicationContext());
 
-                if (gps.canGetLocation() && gps != null){
+                if (gps.canGetLocation() && gps != null && gps.getLocation() != null){
                     data.put("latitude", String.valueOf(gps.getLocation().getLatitude()));
                     data.put("longitude", String.valueOf(gps.getLocation().getLongitude()));
                 } else {
@@ -286,7 +289,7 @@ public class Inicio extends AppCompatActivity {
 
             @Override
             public void onDroidSpeechRmsChanged(float rmsChangedValue) {
-
+                Log.d("droidspeech", "eeooo");
             }
 
             @Override
@@ -406,17 +409,20 @@ public class Inicio extends AppCompatActivity {
                         grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
                         grabando.setVisibility(View.INVISIBLE);
 
-//                    initSpeechToText();
-
+                        initSpeechToText();
                     } else {
                         Toast.makeText(this, "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     if (!info_server.isEmpty()) {
-//                      droidSpeech.closeDroidSpeechOperations();
-//                      droidSpeech = null;
+                        droidSpeech.closeDroidSpeechOperations();
 
                         isLoadingRecording = true;
+
+                        while(!validateMicAvailability()){
+                            try { Thread.sleep(500); }
+                            catch (InterruptedException e) { e.printStackTrace(); }
+                        }
 
                         TextView grabando = (TextView) findViewById(R.id.grabando);
                         grabando.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
@@ -690,6 +696,33 @@ public class Inicio extends AppCompatActivity {
                 startActivity(intent_test);
             }
         }
+    }
+
+    public static boolean validateMicAvailability(){
+        Boolean available = true;
+        AudioRecord recorder =
+                new AudioRecord(MediaRecorder.AudioSource.MIC, 44100,
+                        AudioFormat.CHANNEL_IN_MONO,
+                        AudioFormat.ENCODING_DEFAULT, 44100);
+        try{
+            if(recorder.getRecordingState() != AudioRecord.RECORDSTATE_STOPPED ){
+                available = false;
+
+            }
+
+            recorder.startRecording();
+            if(recorder.getRecordingState() != AudioRecord.RECORDSTATE_RECORDING){
+                recorder.stop();
+                available = false;
+
+            }
+            recorder.stop();
+        } finally{
+            recorder.release();
+            recorder = null;
+        }
+
+        return available;
     }
 
     @Override

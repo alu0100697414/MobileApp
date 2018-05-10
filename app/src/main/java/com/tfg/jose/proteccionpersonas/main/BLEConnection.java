@@ -150,7 +150,7 @@ public class BLEConnection {
             * */
             Log.i("BLE_MAC", String.valueOf(device.getAddress()));
 
-            if(device.getAddress().equals("1C:27:E4:5F:C3:5B")){
+            if(device.getAddress().equals("5A:1E:D0:32:9D:CD")){
                 btAdapter.stopLeScan(leScanCallback);
 
                 // Calculamos la distancia aproximada
@@ -185,14 +185,24 @@ public class BLEConnection {
 
                 // Comenzamos el vídeo streaming automáticamente
                 if(isMyServiceRunning(BackgroundVideoRecorder.class) == false){
+
+                    Inicio.droidSpeech.closeDroidSpeechOperations();
+
+                    Inicio.isLoadingRecording = true;
+
+                    while(!Inicio.validateMicAvailability()){
+                        try { Thread.sleep(500); }
+                        catch (InterruptedException e) { e.printStackTrace(); }
+                    }
+
                     mContext.startService(new Intent(mContext, BackgroundVideoRecorder.class));
+
+                    mActivity.invalidateOptionsMenu(); // Refrescamos el menú
                 }
 
                 TextView recording = (TextView) mActivity.findViewById(R.id.grabando);
                 recording.setCompoundDrawablesWithIntrinsicBounds(R.drawable.grabando, 0, 0, 0);
                 recording.setVisibility(View.VISIBLE);
-
-                mActivity.invalidateOptionsMenu(); // Refrescamos el menú
             }
         }
     };
