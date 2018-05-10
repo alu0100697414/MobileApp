@@ -67,6 +67,7 @@ public class Inicio extends AppCompatActivity {
     public static DroidSpeech droidSpeech;
 
     public static boolean isLoadingRecording = false;
+    private boolean isFirstTime = true;
 
     ScheduledExecutorService executor;
 
@@ -632,6 +633,7 @@ public class Inicio extends AppCompatActivity {
         if (requestCode == 1 && resultCode == -1) {
             finish();
             startActivity(new Intent(this.getApplicationContext(), Inicio.class));
+            isFirstTime = true;
             invalidateOptionsMenu(); // Refrescamos el menú
             Toast.makeText(Inicio.this, R.string.b_activado, Toast.LENGTH_SHORT).show();
         }
@@ -644,12 +646,16 @@ public class Inicio extends AppCompatActivity {
             TextView rssi_dist = (TextView) this.findViewById(R.id.res_distancia);
             rssi_dist.setText("");
 
+            isFirstTime = true;
+
             invalidateOptionsMenu(); // Refrecamos el menú
 
             mNotification.bluetooth_desactivado();
         }
 
         else if (requestCode == 123) { // GPS result
+
+            isFirstTime = true;
 
             gps = new GPSTracker(this);
             if (!gps.canGetLocation()) {
@@ -723,6 +729,88 @@ public class Inicio extends AppCompatActivity {
         }
 
         return available;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        isFirstTime = false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(!isFirstTime){
+
+            bleConnection.isActivated();
+
+            gps = new GPSTracker(this);
+
+            if (!gps.canGetLocation()) {
+                // Si no está activado, se envía aviso para activarlo
+                AlertDialog.Builder bt_dialog = new AlertDialog.Builder(this);
+                bt_dialog.setTitle("Activar GPS");
+                bt_dialog.setMessage("Por favor, active el servicio GPS por si es necesario enviar su ubicación.");
+                bt_dialog.setCancelable(false);
+                bt_dialog.setPositiveButton("Activar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent toGPSEnable = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivityForResult(toGPSEnable, 123);
+                    }
+                });
+                bt_dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mNotification.gps_desactivado();
+
+                        // Enviamos incidencia al servidor
+                        Map<String, String> data = new HashMap<String, String>();
+
+                        data.put("mac", BackgroundVideoRecorder.getWifiMacAddress());
+
+                        List<Contact> contacto;
+                        contacto = protectULLDB.recuperarINFO_USUARIO();
+
+                        if (!contacto.isEmpty()) {
+                            data.put("name", contacto.get(0).getName());
+                            data.put("number", contacto.get(0).getNumber());
+                        } else {
+                            data.put("name", getString(R.string.no_definido));
+                            data.put("number", getString(R.string.no_definido));
+                        }
+
+                        data.put("type_incidence", "4");
+                        data.put("text_incidence", "GPS de la víctima desactivado.");
+
+                        List<String> info_server = new ArrayList<String>();
+                        info_server = protectULLDB.recuperarINFO_SERVER("1");
+
+                        if(!info_server.isEmpty()){
+
+                            try {
+                                Request.sendIncidence(data, info_server.get(0));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (ClassNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (NoSuchAlgorithmException e) {
+                                e.printStackTrace();
+                            } catch (NoSuchProviderException e) {
+                                e.printStackTrace();
+                            } catch (InvalidKeyException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Configure los datos de acceso al servidor.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                bt_dialog.show();
+            }
+        }
     }
 
     @Override
