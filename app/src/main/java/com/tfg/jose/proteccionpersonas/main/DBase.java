@@ -69,13 +69,13 @@ public class DBase extends SQLiteOpenHelper {
     }
 
     // Edita un contacto
-    public void modificarCONTACTO(String tlf, String nom, int act){
+    public void modificarCONTACTO(String oldTlf, String tlf, String nom, int act){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues valores = new ContentValues();
         valores.put("nombre", nom);
         valores.put("telefono", tlf);
         valores.put("activo", act);
-        db.update("contactos", valores, "telefono=" + tlf, null);
+        db.update("contactos", valores, "telefono=" + oldTlf, null);
         db.close();
     }
 

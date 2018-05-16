@@ -152,7 +152,7 @@ public class ContactList extends AppCompatActivity {
                                                     new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int whichButton) {
 
-                                                            protectULLDB.modificarCONTACTO(input2.getText().toString(), input1.getText().toString(), con.getActive());
+                                                            protectULLDB.modificarCONTACTO(con.getNumber(), input2.getText().toString(), input1.getText().toString(), con.getActive());
                                                             mostrarContactos();
                                                         }
                                                     })
@@ -176,7 +176,7 @@ public class ContactList extends AppCompatActivity {
                                     if(estado == 1) { estado = 0; }
                                     else if (estado == 0){ estado = 1; }
 
-                                    protectULLDB.modificarCONTACTO(cont.getNumber(),cont.getName(),estado);
+                                    protectULLDB.modificarCONTACTO(cont.getNumber(),cont.getNumber(),cont.getName(),estado);
                                     mostrarContactos();
                                 }
 
